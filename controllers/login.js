@@ -16,28 +16,28 @@ const connection = mysql.createPool({
 
 function hasSimilarData(gameplayturn, input, turnover, betPlay) {
   if (gameplayturn !== "PlayAllGame") {
-      const dataString = gameplayturn;
-      const dataArray = dataString.split(',');
-      let dataArrayGame = dataArray.some(item => input.includes(item));
-      if (dataArrayGame) {
-          let postTurnover = turnover - betPlay;
-          if (postTurnover < 0) {
-              postTurnover = 0;
-              return postTurnover
-          } else {
-              return postTurnover
-          }
-      } else {
-          return turnover;
-      }
-  } else {
+    const dataString = gameplayturn;
+    const dataArray = dataString.split(',');
+    let dataArrayGame = dataArray.some(item => input.includes(item));
+    if (dataArrayGame) {
       let postTurnover = turnover - betPlay;
       if (postTurnover < 0) {
-          postTurnover = 0;
-          return postTurnover
+        postTurnover = 0;
+        return postTurnover
       } else {
-          return postTurnover
+        return postTurnover
       }
+    } else {
+      return turnover;
+    }
+  } else {
+    let postTurnover = turnover - betPlay;
+    if (postTurnover < 0) {
+      postTurnover = 0;
+      return postTurnover
+    } else {
+      return postTurnover
+    }
   }
 }
 
@@ -200,7 +200,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
         let postTurnover = results[0].turnover - amount;
         if (postTurnover < 0) { postTurnover = 0; }
         const post = {
-          username: usernameGame, gameid: "SLOTXO", bet: amount, win: 0, balance_credit: balanceNow, 
+          username: usernameGame, gameid: "SLOTXO", bet: amount, win: 0, balance_credit: balanceNow,
           userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame
         }
         let balanceturnover = hasSimilarData(results[0].gameplayturn, "SLOTXO", results[0].turnover, amount)
@@ -245,7 +245,7 @@ exports.SettlePlaySlotXo = async (req, res) => {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser + amount;
         const post = {
-          username: usernameGame, gameid: "SLOTXO", bet: 0, win: amount, balance_credit: balanceNow, 
+          username: usernameGame, gameid: "SLOTXO", bet: 0, win: amount, balance_credit: balanceNow,
           userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame
         }
         let repost = repostGame.uploadLogRepostGameAsk(post)
@@ -379,7 +379,7 @@ exports.TransactionSlotXo = async (req, res) => {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser;
         const post = {
-          username: usernameGame, gameid: "SLOTXO", bet: amount, win: 0, balance_credit: balanceNow, 
+          username: usernameGame, gameid: "SLOTXO", bet: amount, win: 0, balance_credit: balanceNow,
           userAgent: userAgent, platform: userAgent, trans_id: timestamp, namegame: namegame
         }
         let repost = repostGame.uploadLogRepostGameAsk(post)
@@ -605,7 +605,7 @@ exports.PlaceBetAsk = async (req, res) => {
         }
 
         const post = {
-          username: account, gameid: "ASKMEBET", bet: amount, win: amount, balance_credit: balanceNow, 
+          username: account, gameid: "ASKMEBET", bet: amount, win: amount, balance_credit: balanceNow,
           userAgent: userAgent, platform: platform, trans_id: trans_id, namegame: namegame
         }
         let repost = repostGame.uploadLogRepostGameAsk(post)
@@ -652,7 +652,7 @@ exports.SettleBetAsk = async (req, res) => {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser + amount;
         const post = {
-          username: account, gameid: "ASKMEBET", bet: 0, win: amount, balance_credit: balanceNow, 
+          username: account, gameid: "ASKMEBET", bet: 0, win: amount, balance_credit: balanceNow,
           userAgent: userAgent, platform: userAgentt, trans_id: trans_id, namegame: namegame
         }
         let repost = repostGame.uploadLogRepostGameAsk(post)
@@ -743,7 +743,7 @@ exports.PlayerBetJili = async (req, res) => {
   const betAmount = req.body.betAmount;
   const winloseAmount = req.body.winloseAmount;
   const userAgent = req.headers['user-agent'];
-  const game= req.body.game;
+  const game = req.body.game;
   let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
@@ -754,7 +754,7 @@ exports.PlayerBetJili = async (req, res) => {
         const balanceNowwit = balanceNow + winloseAmount
         const namegame = results[0].playgameuser;
         const post = {
-          username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit, 
+          username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
           userAgent: userAgent, platform: userAgent, namegame: namegame
         }
         let repost = repostGame.uploadLogRepostGame(post)
@@ -790,21 +790,29 @@ exports.CancelBetJili = async (req, res) => {
   const reqId = req.body.reqId;
   const authHeader = req.body.token;
   const round = req.body.round;
-  username = 'member001';
-
+  const betAmount = req.body.betAmount;
+  
   let spl = `SELECT credit, username FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        res.status(201).json({
-          errorCode: 0,
-          message: "Success",
-          username: results[0].username,
-          currency: "THB",
-          balance: balanceUser,
-          txId: round,
+        const balanceNow = balanceUser - betAmount;
+        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
+        WHERE phonenumber ='${results[0].username}'`;
+        connection.query(sql_update, (error, resultsGame) => {
+          if (error) { console.log(error) }
+          else {
+            res.status(201).json({
+              errorCode: 0,
+              message: "Success",
+              username: results[0].username,
+              currency: "THB",
+              balance: balanceUser,
+              txId: round,
+            });
+          }
         });
       }
     })
