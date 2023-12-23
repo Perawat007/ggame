@@ -208,7 +208,7 @@ exports.GamePlaceBets = async (req, res) => {
                 const idbetPlay = txnsGame[0].id;
                 let balanceNow = balanceUser - betPlay;
 
-                console.log(idbetPlay, results[0].idplaygame)
+                console.log(idbetPlay, results[0].idplaygame, 'setBet')
                 //console.log(balanceUser, betPlay, 'GamePlaceBets');
                 if (balanceUser >= 0 && balanceUser > betPlay) {
                     if (idbetPlay === results[0].idplaygame){
@@ -326,7 +326,7 @@ exports.GameSettleBets = async (req, res) => {
                                         }
                                         let repost = repostGame.uploadLogRepostGame(post)
                                         const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
-                                        roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
+                                        roundId = '${roundId}', idplaygame  = '${idbetPlay}'  WHERE phonenumber ='${usernameGame}'`;
 
                                         connection.query(sql_update, (error, resultsGame) => {
                                             if (error) { console.log(error) }
@@ -355,7 +355,7 @@ exports.GameSettleBets = async (req, res) => {
                                         let repost = repostGame.uploadLogRepostGame(post)
                                         //console.log(balanceUser, balanceNow)
                                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', turnover='${balanceturnover}',
-                                        roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
+                                        roundId = '${roundId}', idplaygame  = '${idbetPlay}' WHERE phonenumber ='${usernameGame}'`;
 
                                         connection.query(sql_update, (error, resultsGame) => {
                                             if (error) { console.log(error) }
