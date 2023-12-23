@@ -208,11 +208,11 @@ exports.GamePlaceBets = async (req, res) => {
                 const betPlay = txnsGame[0].betAmount;
                 const idbetPlay = txnsGame[0].id;
                 let balanceNow = balanceUser - betPlay;
-                
+
                 console.log(idbetPlay, results[0].idplaygame, 'setBet')
                 //console.log(balanceUser, betPlay, 'GamePlaceBets');
                 if (balanceUser >= 0 && balanceUser > betPlay) {
-                    if (roundId != results[0].roundId){
+                    if (roundId === results[0].roundId){
                         if (idbetPlay === results[0].idplaygame){
                             res.status(201).json({
                                 id: id,
