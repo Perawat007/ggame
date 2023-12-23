@@ -791,7 +791,7 @@ exports.CancelBetJili = async (req, res) => {
   const authHeader = req.body.token;
   const round = req.body.round;
   const betAmount = req.body.betAmount;
-  
+
   let spl = `SELECT credit, username FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
@@ -809,7 +809,7 @@ exports.CancelBetJili = async (req, res) => {
               message: "Success",
               username: results[0].username,
               currency: "THB",
-              balance: balanceUser,
+              balance: balanceNow,
               txId: round,
             });
           }
