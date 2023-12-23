@@ -196,6 +196,7 @@ exports.GamePlaceBets = async (req, res) => {
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
     const roundId = txnsGame[0].roundId;
+    
     let spl = `SELECT credit, turnover, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' ORDER BY phonenumber ASC`;
     try {
         connection.query(spl, (error, results) => {
@@ -207,36 +208,47 @@ exports.GamePlaceBets = async (req, res) => {
                 const betPlay = txnsGame[0].betAmount;
                 const idbetPlay = txnsGame[0].id;
                 let balanceNow = balanceUser - betPlay;
+                if (resultsstart.length <= 0) {
 
+                }
                 console.log(idbetPlay, results[0].idplaygame, 'setBet')
                 //console.log(balanceUser, betPlay, 'GamePlaceBets');
                 if (balanceUser >= 0 && balanceUser > betPlay) {
-                    if (idbetPlay === results[0].idplaygame){
+                    if (roundId != results[0].roundId){
+                        if (idbetPlay === results[0].idplaygame){
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 20002,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                            });
+                        } else {
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}'
+                            WHERE phonenumber ='${usernameGame}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        id: id,
+                                        statusCode: 0,
+                                        timestampMillis: timestampMillis,
+                                        productId: productId,
+                                        currency: currency,
+                                        username: usernameGame,
+                                        balanceBefore: balanceUser,
+                                        balanceAfter: balanceNow,
+                                    });
+                                }
+                            });
+                        } 
+                    } else {
                         res.status(201).json({
                             id: id,
                             statusCode: 20002,
                             timestampMillis: timestampMillis,
                             productId: productId,
                         });
-                    } else {
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}'
-                        WHERE phonenumber ='${usernameGame}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
-                            if (error) { console.log(error) }
-                            else {
-                                res.status(201).json({
-                                    id: id,
-                                    statusCode: 0,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
-                                    currency: currency,
-                                    username: usernameGame,
-                                    balanceBefore: balanceUser,
-                                    balanceAfter: balanceNow,
-                                });
-                            }
-                        });
-                    } 
+                    }
                 }
                 else {
                     balanceNow = 0;
