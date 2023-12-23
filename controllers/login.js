@@ -750,33 +750,41 @@ exports.PlayerBetJili = async (req, res) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        const balanceNow = balanceUser - betAmount;
-        const balanceNowwit = balanceNow + winloseAmount
-        const namegame = results[0].playgameuser;
-        const post = {
-          username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
-          userAgent: userAgent, platform: userAgent, namegame: namegame
-        }
-        let repost = repostGame.uploadLogRepostGame(post)
-
-        let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
-
-        const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}'
-        WHERE phonenumber ='${results[0].username}'`;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              errorCode: 0,
-              message: "success",
-              username: results[0].username,
-              currency: "THB",
-              balance: balanceNowwit,
-              txId: round,
-              token: authHeader
-            });
+        if (balanceUser < betAmount) {
+          res.status(201).json({
+            errorCode: 2,
+            message: "Not enough balance",
+          });
+        } else {
+          const balanceNow = balanceUser - betAmount;
+          const balanceNowwit = balanceNow + winloseAmount
+          const namegame = results[0].playgameuser;
+          const post = {
+            username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
+            userAgent: userAgent, platform: userAgent, namegame: namegame
           }
-        });
+          let repost = repostGame.uploadLogRepostGame(post)
+
+          let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
+
+          const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}'
+        WHERE phonenumber ='${results[0].username}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                errorCode: 0,
+                message: "success",
+                username: results[0].username,
+                currency: "THB",
+                balance: balanceNowwit,
+                txId: round,
+                token: authHeader
+              });
+            }
+          });
+        }
+
       }
     })
   } catch (err) {
@@ -798,7 +806,7 @@ exports.CancelBetJili = async (req, res) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        if(winloseAmount !== 0){
+        if (winloseAmount !== 0) {
           const balanceNow = balanceUser - betAmount;
           const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
           WHERE phonenumber ='${results[0].username}'`;
