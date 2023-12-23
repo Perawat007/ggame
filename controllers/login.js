@@ -767,8 +767,8 @@ exports.PlayerBetJili = async (req, res) => {
 
           let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
 
-          const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}'
-        WHERE phonenumber ='${results[0].username}'`;
+          const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}',
+          roundId = '${round}' WHERE phonenumber ='${results[0].username}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
             else {
@@ -800,46 +800,53 @@ exports.CancelBetJili = async (req, res) => {
   const round = req.body.round;
   const betAmount = req.body.betAmount;
   const winloseAmount = req.body.winloseAmount;
-  let spl = `SELECT credit, username FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
+  let spl = `SELECT credit, username, roundId FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const balanceUser = parseFloat(results[0].credit);
-        if (winloseAmount !== 0) {
-          const balanceNow = balanceUser - betAmount;
-          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
-          WHERE phonenumber ='${results[0].username}'`;
-          connection.query(sql_update, (error, resultsGame) => {
-            if (error) { console.log(error) }
-            else {
-              res.status(201).json({
-                errorCode: 0,
-                message: "Success",
-                username: results[0].username,
-                currency: "THB",
-                balance: balanceNow,
-                txId: round,
-              });
-            }
+        if (results[0].roundId !== round) {
+          res.status(201).json({
+            errorCode: 2,
+            message: "Not enough balance",
           });
         } else {
-          const balanceNow = balanceUser + betAmount;
-          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
-          WHERE phonenumber ='${results[0].username}'`;
-          connection.query(sql_update, (error, resultsGame) => {
-            if (error) { console.log(error) }
-            else {
-              res.status(201).json({
-                errorCode: 0,
-                message: "Success",
-                username: results[0].username,
-                currency: "THB",
-                balance: balanceNow,
-                txId: round,
-              });
-            }
-          });
+          const balanceUser = parseFloat(results[0].credit);
+          if (winloseAmount !== 0) {
+            const balanceNow = balanceUser - betAmount;
+            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
+            WHERE phonenumber ='${results[0].username}'`;
+            connection.query(sql_update, (error, resultsGame) => {
+              if (error) { console.log(error) }
+              else {
+                res.status(201).json({
+                  errorCode: 0,
+                  message: "Success",
+                  username: results[0].username,
+                  currency: "THB",
+                  balance: balanceNow,
+                  txId: round,
+                });
+              }
+            });
+          } else {
+            const balanceNow = balanceUser + betAmount;
+            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
+            WHERE phonenumber ='${results[0].username}'`;
+            connection.query(sql_update, (error, resultsGame) => {
+              if (error) { console.log(error) }
+              else {
+                res.status(201).json({
+                  errorCode: 0,
+                  message: "Success",
+                  username: results[0].username,
+                  currency: "THB",
+                  balance: balanceNow,
+                  txId: round,
+                });
+              }
+            });
+          }
         }
       }
     })
