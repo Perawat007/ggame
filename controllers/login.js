@@ -791,29 +791,48 @@ exports.CancelBetJili = async (req, res) => {
   const authHeader = req.body.token;
   const round = req.body.round;
   const betAmount = req.body.betAmount;
-
+  const winloseAmount = req.body.winloseAmount;
   let spl = `SELECT credit, username FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        const balanceNow = balanceUser - betAmount;
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
-        WHERE phonenumber ='${results[0].username}'`;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              errorCode: 0,
-              message: "Success",
-              username: results[0].username,
-              currency: "THB",
-              balance: balanceNow,
-              txId: round,
-            });
-          }
-        });
+        if(winloseAmount !== 0){
+          const balanceNow = balanceUser - betAmount;
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
+          WHERE phonenumber ='${results[0].username}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                errorCode: 0,
+                message: "Success",
+                username: results[0].username,
+                currency: "THB",
+                balance: balanceNow,
+                txId: round,
+              });
+            }
+          });
+        } else {
+          const balanceNow = balanceUser + betAmount;
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betAmount}'
+          WHERE phonenumber ='${results[0].username}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                errorCode: 0,
+                message: "Success",
+                username: results[0].username,
+                currency: "THB",
+                balance: balanceNow,
+                txId: round,
+              });
+            }
+          });
+        }
       }
     })
   } catch (err) {
