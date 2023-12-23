@@ -289,9 +289,8 @@ exports.GameSettleBets = async (req, res) => {
         connection.query(splTest, (error, resultsstart) => {
             if (error) { console.log(error) }
             else {
-                console.log(resultsstart[0].roundId, roundId)
-                
                 if (resultsstart.length <= 0) {
+                    console.log(resultsstart[0].roundId, roundId)
                     let spl = `SELECT credit, turnover, gameplayturn, playgameuser, tokenplaygame, bet_latest, idplaygame FROM member 
                     WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
 
