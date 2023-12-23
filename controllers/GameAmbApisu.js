@@ -290,7 +290,6 @@ exports.GameSettleBets = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 if (resultsstart.length <= 0) {
-                    console.log(resultsstart[0].roundId, roundId)
                     let spl = `SELECT credit, turnover, gameplayturn, playgameuser, tokenplaygame, bet_latest, idplaygame FROM member 
                     WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
 
@@ -392,8 +391,10 @@ exports.GameSettleBets = async (req, res) => {
                         }
                     })
                 } else {
+                    console.log(resultsstart[0].roundId, roundId)
                     const balanceUser = parseFloat(resultsstart[0].credit);
                     res.status(201).json({
+                        tpyetest: 'round = 1',
                         id: id,
                         statusCode: 0,
                         timestampMillis: timestampMillis,
