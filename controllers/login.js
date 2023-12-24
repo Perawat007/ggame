@@ -738,53 +738,58 @@ exports.PlayerBetJili = async (req, res) => {
   const reqId = req.body.reqId;
   const authHeader = req.body.token;
   const round = req.body.round;
-  const username = '0990825941';
   const isFreeRound = req.body.isFreeRound;
   const betAmount = req.body.betAmount;
   const winloseAmount = req.body.winloseAmount;
   const userAgent = req.headers['user-agent'];
   const game = req.body.game;
-  let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
+  let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser, roundId FROM member WHERE tokenplaygame ='${authHeader}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const balanceUser = parseFloat(results[0].credit);
-        if (balanceUser < betAmount) {
+        if (results[0].roundId === round){
           res.status(201).json({
-            errorCode: 2,
-            message: "Not enough balance",
+            errorCode: 1,
+            message: "Already accepted",
           });
         } else {
-          const balanceNow = balanceUser - betAmount;
-          const balanceNowwit = balanceNow + winloseAmount
-          const namegame = results[0].playgameuser;
-          const post = {
-            username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
-            userAgent: userAgent, platform: userAgent, namegame: namegame
-          }
-          let repost = repostGame.uploadLogRepostGame(post)
-
-          let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
-
-          const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}',
-          roundId = '${round}' WHERE phonenumber ='${results[0].username}'`;
-          connection.query(sql_update, (error, resultsGame) => {
-            if (error) { console.log(error) }
-            else {
-              res.status(201).json({
-                errorCode: 0,
-                message: "success",
-                username: results[0].username,
-                currency: "THB",
-                balance: balanceNowwit,
-                txId: round,
-                token: authHeader
-              });
+          const balanceUser = parseFloat(results[0].credit);
+          if (balanceUser < betAmount) {
+            res.status(201).json({
+              errorCode: 2,
+              message: "Not enough balance",
+            });
+          } else {
+            const balanceNow = balanceUser - betAmount;
+            const balanceNowwit = balanceNow + winloseAmount
+            const namegame = results[0].playgameuser;
+            const post = {
+              username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
+              userAgent: userAgent, platform: userAgent, namegame: namegame
             }
-          });
+            let repost = repostGame.uploadLogRepostGame(post)
+  
+            let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
+  
+            const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}',
+            roundId = '${round}' WHERE phonenumber ='${results[0].username}'`;
+            connection.query(sql_update, (error, resultsGame) => {
+              if (error) { console.log(error) }
+              else {
+                res.status(201).json({
+                  errorCode: 0,
+                  message: "success",
+                  username: results[0].username,
+                  currency: "THB",
+                  balance: balanceNowwit,
+                  txId: round,
+                  token: authHeader
+                });
+              }
+            });
+          }
         }
-
       }
     })
   } catch (err) {
