@@ -220,7 +220,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                         } else {
                             if (results[0].actiongamenow === 'cancelBetNoupdate') {
                                 const sql_update = `UPDATE member set bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                                actiongamenow ='placeBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
+                                actiongamenow ='placeBetNoupdate', unsettleplay = 'N' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) {
                                         console.log(error);
@@ -241,7 +241,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                             } else {
                                 let balanceNow = balanceUser - betPlay;
                                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                                actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
+                                actiongamenow ='placeBet', unsettleplay = 'N' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) {
                                         console.log(error);
@@ -700,7 +700,7 @@ http: exports.GameUnsettleBets = async (req, res) => {
             if (error) {
                 console.log(error);
             } else {
-                if (results[0].unsettleplay === "N") {
+                if (results[0].unsettleplay === 'N') {
                     const balanceUser = parseFloat(results[0].credit);
                     let balanceAfter = balanceUser - payoutAmount;
 
