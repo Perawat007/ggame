@@ -513,8 +513,8 @@ exports.GameUnsettleBets = async (req, res) => {
             else {
                 const balanceUser = parseFloat(results[0].credit);
                 let balanceAfter = balanceUser - payoutAmount
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${txnsGame[0].betAmount}' WHERE phonenumber ='${usernameGame}'`;
-                connection.query(sql_update, (error, results) => {
+                const sql_update = `UPDATE member set credit='${balanceAfter}',bet_latest='${txnsGame[0].betAmount}' WHERE phonenumber ='${usernameGame}'`;
+                connection.query(sql_update, (error, resultsgg) => {
                     if (error) { console.log(error) }
                     else {
                         res.status(201).json({
