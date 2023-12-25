@@ -501,6 +501,8 @@ exports.GameCancelBets = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
+                const balanceUser = parseFloat(results[0].credit);
+                const betPlay = txnsGame[0].betAmount;
                 if (results[0].bet_latest === 0 || results[0].bet_latest === 0.00) {
                     res.status(201).json({
                         id: id,
@@ -515,9 +517,18 @@ exports.GameCancelBets = async (req, res) => {
                         timestampMillis: timestampMillis,
                         productId: productId,
                     });
+                } else if (results[0].actiongamenow === 'cancelBet') {
+                    res.status(201).json({
+                        id: id,
+                        statusCode: 0,
+                        timestampMillis: timestampMillis,
+                        productId: productId,
+                        currency: currency,
+                        balanceBefore: balanceUser,
+                        balanceAfter: balanceUser,
+                        username: usernameGame
+                    });
                 } else {
-                    const balanceUser = parseFloat(results[0].credit);
-                    const betPlay = txnsGame[0].betAmount;
                     if (betPlay <= 0) {
                         const balanceNow = balanceUser - betPlay;
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow ='cancelBet'
