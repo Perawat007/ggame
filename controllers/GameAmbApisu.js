@@ -504,7 +504,7 @@ exports.GameUnsettleBets = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
-    const payoutAmount = req.body.payoutAmount
+    const payoutAmount = txnsGame[0].payoutAmount
     let spl = `SELECT credit, tokenplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
