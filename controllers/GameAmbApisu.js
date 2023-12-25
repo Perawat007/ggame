@@ -397,17 +397,26 @@ exports.GameSettleBets = async (req, res) => {
                 } else {
                     console.log(resultsstart[0].roundId, roundId)
                     const balanceUser = parseFloat(resultsstart[0].credit);
-                    res.status(201).json({
-                        tpyetest: 'round = 1',
-                        id: id,
-                        statusCode: 0,
-                        timestampMillis: timestampMillis,
-                        productId: productId,
-                        currency: currency,
-                        balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                        balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                        username: usernameGame
-                    });
+                    if (productId === 'CQ9V2'){
+                        res.status(201).json({
+                            id: id,
+                            statusCode: 20002,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                        });
+                    } else {
+                        res.status(201).json({
+                            tpyetest: 'round = 1',
+                            id: id,
+                            statusCode: 0,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                            currency: currency,
+                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                            balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                            username: usernameGame
+                        });
+                    }
                 }
             }
         })
