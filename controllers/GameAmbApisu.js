@@ -218,50 +218,28 @@ http: exports.GamePlaceBets = async (req, res) => {
                                 }
                             });
                         } else {
-                            if (results[0].actiongamenow === 'cancelBet') {
-                                const sql_update = `UPDATE member set bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                                actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
-                                connection.query(sql_update, (error, resultsGame) => {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        res.status(201).json({
-                                            id: id,
-                                            statusCode: 0,
-                                            timestampMillis: timestampMillis,
-                                            productId: productId,
-                                            currency: currency,
-                                            username: usernameGame,
-                                            balanceBefore: balanceUser,
-                                            balanceAfter: balanceUser,
-                                            action: "GamePlaceBets_NO",
-                                        });
-                                    }
-                                });
-                            } else {
-                                let balanceNow = balanceUser - betPlay;
-                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                            let balanceNow = balanceUser - betPlay;
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
                             actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
-                                connection.query(sql_update, (error, resultsGame) => {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        res.status(201).json({
-                                            id: id,
-                                            statusCode: 0,
-                                            timestampMillis: timestampMillis,
-                                            productId: productId,
-                                            currency: currency,
-                                            username: usernameGame,
-                                            balanceBefore: balanceUser,
-                                            balanceAfter: balanceNow,
-                                            action: "GamePlaceBets_ON",
-                                            idbetPlayO: idbetPlay,
-                                            idbetPlay: results[0].idplaygame,
-                                        });
-                                    }
-                                });
-                            }
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    res.status(201).json({
+                                        id: id,
+                                        statusCode: 0,
+                                        timestampMillis: timestampMillis,
+                                        productId: productId,
+                                        currency: currency,
+                                        username: usernameGame,
+                                        balanceBefore: balanceUser,
+                                        balanceAfter: balanceNow,
+                                        action: "GamePlaceBets_ON",
+                                        idbetPlayO: idbetPlay,
+                                        idbetPlay: results[0].idplaygame,
+                                    });
+                                }
+                            });
                         }
                     }
                 } else {
