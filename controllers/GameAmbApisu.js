@@ -504,7 +504,7 @@ exports.GameUnsettleBets = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
-    username = 'member001';
+    const payoutAmount = req.body.payoutAmount
     let spl = `SELECT credit, tokenplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
@@ -512,25 +512,18 @@ exports.GameUnsettleBets = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                let spl_game = `SELECT * FROM repostgame WHERE balance_credit ='${balanceUser}' AND trans_id = ${results[0].tokenplaygame} `;
-                connection.query(spl_game, (error, results_game) => {
-                    if (error) { console.log(error) }
-                    else {
-                        console.log(results_game.length)
-                        let balanceAfter = (balanceUser - results_game[0].win) + results_game[0].bet
-                        console.log(balanceAfter, balanceUser)
-                        res.status(201).json({
-                            id: id,
-                            statusCode: 0,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                            currency: currency,
-                            balanceBefore: balanceUser,
-                            balanceAfter: balanceAfter,
-                            username: usernameGame
-                        });
-                    }
-                })
+                let balanceAfter = balanceUser - payoutAmount
+                console.log(balanceAfter, balanceUser)
+                res.status(201).json({
+                    id: id,
+                    statusCode: 0,
+                    timestampMillis: timestampMillis,
+                    productId: productId,
+                    currency: currency,
+                    balanceBefore: balanceUser,
+                    balanceAfter: balanceAfter,
+                    username: usernameGame
+                });
             }
         })
     } catch (err) {
