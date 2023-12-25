@@ -122,22 +122,16 @@ exports.GameCheckBalance = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 if (results.length >= 1) {
-                    const sql_update = `UPDATE member set actiongamenow ='getBalance' WHERE phonenumber ='${usernameGame}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            const balanceUser = parseFloat(results[0].credit);
-                            res.status(201).json({
-                                id: id,
-                                statusCode: 0,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                                currency: currency,
-                                balance: balanceUser,
-                                username: usernameGame
-                            });
-                        }
-                    })
+                    const balanceUser = parseFloat(results[0].credit);
+                    res.status(201).json({
+                        id: id,
+                        statusCode: 0,
+                        timestampMillis: timestampMillis,
+                        productId: productId,
+                        currency: currency,
+                        balance: balanceUser,
+                        username: usernameGame
+                    });
                 } else {
                     res.status(201).json({
                         id: id,
