@@ -1364,15 +1364,10 @@ function getItem(key) {
 }
 
 app.post('/testToken', async (req, res) => {
+    const quantity = req.body.quantity;
+    const phonenumber = req.body.phonenumber;
 
-    let x = 2 *
-
-        res.send({
-            wingame: formattedDateStart,
-            betGame: formattedDateEnd,
-        });
-    res.end();
-
+    console.log(phonenumber, quantity);
 })
 
 
