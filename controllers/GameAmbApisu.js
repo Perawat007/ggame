@@ -175,7 +175,7 @@ exports.GamePlaceBets = async (req, res) => {
 
                 console.log(roundId, results[0].roundId, 'setBet')
                 //console.log(balanceUser, betPlay, 'GamePlaceBets');
-                if (balanceUser >= 0 && balanceUser > betPlay) {
+                if (balanceUser >= 0 && balanceUser >= betPlay) {
                     if (idbetPlay === results[0].idplaygame) {
                         res.status(201).json({
                             id: id,
@@ -210,8 +210,7 @@ exports.GamePlaceBets = async (req, res) => {
                             }
                         });
                     }
-                }
-                else {
+                } else {
                     balanceNow = 0;
                     status = 10002;
                     res.status(201).json({
@@ -222,7 +221,8 @@ exports.GamePlaceBets = async (req, res) => {
                         currency: currency,
                         balanceBefore: balanceUser,
                         balanceAfter: balanceNow,
-                        username: usernameGame
+                        username: usernameGame,
+                        action: 'PlaceBets_field'
                     });
                 }
             }
