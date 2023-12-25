@@ -759,7 +759,54 @@ http: exports.GameWinRewards = async (req, res) => {
                 const betpayoutAmount = txnsGame[0].payoutAmount;
                 const balanceNow = balanceUser + betpayoutAmount;
 
-                if (results[0].winbonus === 'N'){
+                if (roundId === results[0].roundId) {
+                    if (results[0].unsettleplay === 'Y') {
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}',
+                        roundId = '${roundId}', winbonus ='Y' WHERE phonenumber ='${usernameGame}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                res.status(201).json({
+                                    username: usernameGame,
+                                    id: id,
+                                    statusCode: 0,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    currency: currency,
+                                    balanceBefore: balanceUser,
+                                    balanceAfter: balanceNow,
+                                });
+                            }
+                        });
+                    } else if (results[0].winbonus === 'N' && results[0].unsettleplay === 'N') {
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}',
+                        roundId = '${roundId}', winbonus ='Y' WHERE phonenumber ='${usernameGame}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                res.status(201).json({
+                                    username: usernameGame,
+                                    id: id,
+                                    statusCode: 0,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    currency: currency,
+                                    balanceBefore: balanceUser,
+                                    balanceAfter: balanceNow,
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            id: id,
+                            statusCode: 20002,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                        });
+                    }
+                } else {
                     const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}',
                     roundId = '${roundId}', winbonus ='Y' WHERE phonenumber ='${usernameGame}'`;
                     connection.query(sql_update, (error, resultsGame) => {
@@ -777,13 +824,6 @@ http: exports.GameWinRewards = async (req, res) => {
                                 balanceAfter: balanceNow,
                             });
                         }
-                    });
-                } else {
-                    res.status(201).json({
-                        id: id,
-                        statusCode: 20002,
-                        timestampMillis: timestampMillis,
-                        productId: productId,
                     });
                 }
             }
