@@ -176,7 +176,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                 const betPlay = txnsGame[0].betAmount;
                 const idbetPlay = txnsGame[0].id;
 
-                console.log(roundId, results[0].roundId, "setBet");
+                //console.log(roundId, results[0].roundId, "setBet");
                 //console.log(balanceUser, betPlay, 'GamePlaceBets');
                 if (balanceUser >= 0 && balanceUser >= betPlay) {
                     if (idbetPlay === results[0].idplaygame) {
@@ -218,28 +218,50 @@ http: exports.GamePlaceBets = async (req, res) => {
                                 }
                             });
                         } else {
-                            let balanceNow = balanceUser - betPlay;
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                            actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) {
-                                    console.log(error);
-                                } else {
-                                    res.status(201).json({
-                                        id: id,
-                                        statusCode: 0,
-                                        timestampMillis: timestampMillis,
-                                        productId: productId,
-                                        currency: currency,
-                                        username: usernameGame,
-                                        balanceBefore: balanceUser,
-                                        balanceAfter: balanceNow,
-                                        action: "GamePlaceBets_ON",
-                                        idbetPlayO: idbetPlay,
-                                        idbetPlay: results[0].idplaygame,
-                                    });
-                                }
-                            });
+                            if (results[0].actiongamenow === 'cancelBetNoupdate'){
+                                const sql_update = `UPDATE member set bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                                actiongamenow ='placeBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            username: usernameGame,
+                                            balanceBefore: balanceUser,
+                                            balanceAfter: balanceUser,
+                                            action: "GamePlaceBets_ON",
+                                        });
+                                    }
+                                });
+                            } else {
+                                let balanceNow = balanceUser - betPlay;
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                                actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            username: usernameGame,
+                                            balanceBefore: balanceUser,
+                                            balanceAfter: balanceNow,
+                                            action: "GamePlaceBets_ON",
+                                            idbetPlayO: idbetPlay,
+                                            idbetPlay: results[0].idplaygame,
+                                        });
+                                    }
+                                });
+                            }
                         }
                     }
                 } else {
@@ -550,15 +572,22 @@ http: exports.GameCancelBets = async (req, res) => {
                         productId: productId,
                     });
                 } else if (results[0].actiongamenow === "cancelBet") {
-                    res.status(201).json({
-                        id: id,
-                        statusCode: 0,
-                        timestampMillis: timestampMillis,
-                        productId: productId,
-                        currency: currency,
-                        balanceBefore: balanceUser,
-                        balanceAfter: balanceUser,
-                        username: usernameGame,
+                    const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
+                    connection.query(sql_updateaction, (error, resultsGame) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 0,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                currency: currency,
+                                balanceBefore: balanceUser,
+                                balanceAfter: balanceUser,
+                                username: usernameGame,
+                            });
+                        }
                     });
                 } else {
                     if (betPlay <= 0) {
