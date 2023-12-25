@@ -304,7 +304,7 @@ http: exports.GameSettleBets = async (req, res) => {
                             console.log(error);
                         } else {
                             if (results[0].actiongamenow === "cancelBet") {
-                                const sql_update = `UPDATE member set bet_latest='${0.01} WHERE phonenumber ='${usernameGame}'`;
+                                const sql_update = `UPDATE member set bet_latest='${0.01}' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) {
                                         console.log(error);
@@ -347,22 +347,9 @@ http: exports.GameSettleBets = async (req, res) => {
                                                     "-NO"
                                                 );
                                                 let balanceNow = balanceUser - betAmount;
-                                                let balanceturnover = hasSimilarData(
-                                                    results[0].gameplayturn,
-                                                    productId,
-                                                    results[0].turnover,
-                                                    betPlay
-                                                );
-                                                const post = {
-                                                    username: usernameGame,
-                                                    gameid: productId,
-                                                    bet: betPlay,
-                                                    win: betAmount,
-                                                    balance_credit: balanceNow,
-                                                    userAgent: userAgent,
-                                                    platform: userAgentt,
-                                                    namegame: namegame,
-                                                    trans_id: txnsGame[0].tokenplaygame,
+                                                let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
+                                                const post = {username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
                                                 };
                                                 let repost = repostGame.uploadLogRepostGame(post);
                                                 const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',roundId = '${roundId}',
