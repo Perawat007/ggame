@@ -117,7 +117,7 @@ http: exports.GameCheckBalance = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const sessionToken = req.body.sessionToken;
-    if (sessionToken !== undefined) {
+    if (sessionToken === undefined) {
         let spl = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete ='N'`;
         try {
             connection.query(spl, (error, results) => {
