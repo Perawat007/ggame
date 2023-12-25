@@ -548,7 +548,7 @@ http: exports.GameSettleBets = async (req, res) => {
                 } else {
                     console.log(resultsstart[0].roundId, roundId);
                     const balanceUser = parseFloat(resultsstart[0].credit);
-                    if (productId === "CQ9V2") {
+                    if (productId === "CQ9V2" || productId === "ACE333" ) {
                         res.status(201).json({
                             id: id,
                             statusCode: 20002,
