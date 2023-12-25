@@ -161,7 +161,7 @@ exports.GamePlaceBets = async (req, res) => {
     const txnsGame = req.body.txns;
     const roundId = txnsGame[0].roundId;
 
-    let spl = `SELECT credit, turnover, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' ORDER BY phonenumber ASC`;
+    let spl = `SELECT credit, turnover, roundId, idplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' ORDER BY phonenumber ASC`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -206,6 +206,9 @@ exports.GamePlaceBets = async (req, res) => {
                                     username: usernameGame,
                                     balanceBefore: balanceUser,
                                     balanceAfter: balanceNow,
+                                    action: 'GamePlaceBets_ON',
+                                    idbetPlayO: idbetPlay,
+                                    idbetPlay: results[0].idplaygame
                                 });
                             }
                         });
