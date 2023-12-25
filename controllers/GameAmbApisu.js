@@ -197,7 +197,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                         if (betPlay <= 0) {
                             let balanceNow = balanceUser + betPlay;
                             const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                            actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
+                            actiongamenow ='placeBet', unsettleplay = 'N' WHERE phonenumber ='${usernameGame}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) {
                                     console.log(error);
@@ -218,7 +218,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                 }
                             });
                         } else {
-                            if (results[0].actiongamenow === 'cancelBetNoupdate'){
+                            if (results[0].actiongamenow === 'cancelBetNoupdate') {
                                 const sql_update = `UPDATE member set bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
                                 actiongamenow ='placeBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
@@ -564,7 +564,7 @@ http: exports.GameCancelBets = async (req, res) => {
                         timestampMillis: timestampMillis,
                         productId: productId,
                     });
-                } else if (results[0].actiongamenow === "settleBet") {
+                } else if (results[0].actiongamenow === "settleBet" || results[0].actiongamenow === "settleBetWin") {
                     res.status(201).json({
                         id: id,
                         statusCode: 20004,
@@ -693,33 +693,43 @@ http: exports.GameUnsettleBets = async (req, res) => {
     const txnsGame = req.body.txns;
     const payoutAmount = txnsGame[0].payoutAmount;
     const roundId = txnsGame[0].roundId;
-    let spl = `SELECT credit, tokenplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' 
+    let spl = `SELECT credit, tokenplaygame, unsettleplay FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
         connection.query(spl, (error, results) => {
             if (error) {
                 console.log(error);
             } else {
-                const balanceUser = parseFloat(results[0].credit);
-                let balanceAfter = balanceUser - payoutAmount;
-                const sql_update = `UPDATE member set credit='${balanceAfter}',bet_latest='${txnsGame[0].betAmount}', roundId = '11111111111111'
-                WHERE phonenumber ='${usernameGame}'`;
-                connection.query(sql_update, (error, resultsgg) => {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        res.status(201).json({
-                            id: id,
-                            statusCode: 0,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                            currency: currency,
-                            balanceBefore: balanceUser,
-                            balanceAfter: balanceAfter,
-                            username: usernameGame,
-                        });
-                    }
-                });
+                if (results[0].unsettleplay === "N") {
+                    const balanceUser = parseFloat(results[0].credit);
+                    let balanceAfter = balanceUser - payoutAmount;
+
+                    const sql_update = `UPDATE member set credit='${balanceAfter}',bet_latest='${txnsGame[0].betAmount}', roundId = '11111111111111',
+                    unsettleplay = 'Y' WHERE phonenumber ='${usernameGame}'`;
+                    connection.query(sql_update, (error, resultsgg) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 0,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                currency: currency,
+                                balanceBefore: balanceUser,
+                                balanceAfter: balanceAfter,
+                                username: usernameGame,
+                            });
+                        }
+                    });
+                } else {
+                    res.status(201).json({
+                        id: id,
+                        statusCode: 20002,
+                        timestampMillis: timestampMillis,
+                        productId: productId,
+                    });
+                }
             }
         });
     } catch (err) {
