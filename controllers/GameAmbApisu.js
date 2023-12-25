@@ -333,7 +333,7 @@ exports.GameSettleBets = async (req, res) => {
                                             }
                                             let repost = repostGame.uploadLogRepostGame(post)
                                             const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',roundId = '${roundId}',
-                                            idplaygame  = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
+                                            idplaygame = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
 
                                             connection.query(sql_update, (error, resultsGame) => {
                                                 if (error) { console.log(error) }
@@ -505,7 +505,7 @@ exports.GameCancelBets = async (req, res) => {
                         timestampMillis: timestampMillis,
                         productId: productId,
                     });
-                } else if (results[0].actiongamenow === 'getBalance') {
+                } else if (results[0].actiongamenow === 'settleBet') {
                     res.status(201).json({
                         id: id,
                         statusCode: 20004,
