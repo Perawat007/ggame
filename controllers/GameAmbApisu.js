@@ -275,7 +275,7 @@ exports.GameSettleBets = async (req, res) => {
                             const betPlay = txnsGame[0].betAmount;
                             const idbetPlay = txnsGame[0].id;
                             let status = 0;
-                            //console.log(balanceUser, betAmount, betPlay, 'GameSettleBets');
+                            console.log(balanceUser, betAmount, betPlay, 'GameSettleBets');
                             if (balanceUser >= 0 && balanceUser >= betPlay) {
                                 if (betPlay === 0 && betAmount === betPlay) {
                                     res.status(201).json({
@@ -347,8 +347,7 @@ exports.GameSettleBets = async (req, res) => {
                                         });
                                     }
                                 }
-                            }
-                            else {
+                            } else {
                                 status = 10002;
                                 res.status(201).json({
                                     id: id,
