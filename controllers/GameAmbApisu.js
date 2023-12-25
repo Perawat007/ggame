@@ -163,7 +163,8 @@ http: exports.GamePlaceBets = async (req, res) => {
     const txnsGame = req.body.txns;
     const roundId = txnsGame[0].roundId;
 
-    let spl = `SELECT credit, turnover, roundId, idplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' ORDER BY phonenumber ASC`;
+    let spl = `SELECT credit, turnover, roundId, idplaygame, actiongamenow FROM member 
+    WHERE phonenumber ='${usernameGame}' AND status_delete='N' ORDER BY phonenumber ASC`;
     try {
         connection.query(spl, (error, results) => {
             if (error) {
@@ -217,28 +218,50 @@ http: exports.GamePlaceBets = async (req, res) => {
                                 }
                             });
                         } else {
-                            let balanceNow = balanceUser - betPlay;
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                            if (results[0].actiongamenow === 'cancelBet') {
+                                const sql_update = `UPDATE member set bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                                actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            username: usernameGame,
+                                            balanceBefore: balanceUser,
+                                            balanceAfter: balanceUser,
+                                            action: "GamePlaceBets_NO",
+                                        });
+                                    }
+                                });
+                            } else {
+                                let balanceNow = balanceUser - betPlay;
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
                             actiongamenow ='placeBet' WHERE phonenumber ='${usernameGame}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) {
-                                    console.log(error);
-                                } else {
-                                    res.status(201).json({
-                                        id: id,
-                                        statusCode: 0,
-                                        timestampMillis: timestampMillis,
-                                        productId: productId,
-                                        currency: currency,
-                                        username: usernameGame,
-                                        balanceBefore: balanceUser,
-                                        balanceAfter: balanceNow,
-                                        action: "GamePlaceBets_ON",
-                                        idbetPlayO: idbetPlay,
-                                        idbetPlay: results[0].idplaygame,
-                                    });
-                                }
-                            });
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            username: usernameGame,
+                                            balanceBefore: balanceUser,
+                                            balanceAfter: balanceNow,
+                                            action: "GamePlaceBets_ON",
+                                            idbetPlayO: idbetPlay,
+                                            idbetPlay: results[0].idplaygame,
+                                        });
+                                    }
+                                });
+                            }
                         }
                     }
                 } else {
@@ -348,7 +371,8 @@ http: exports.GameSettleBets = async (req, res) => {
                                                 );
                                                 let balanceNow = balanceUser - betAmount;
                                                 let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
-                                                const post = {username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                const post = {
+                                                    username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
                                                     userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
                                                 };
                                                 let repost = repostGame.uploadLogRepostGame(post);
@@ -374,31 +398,12 @@ http: exports.GameSettleBets = async (req, res) => {
                                                     }
                                                 });
                                             } else {
-                                                console.log(
-                                                    balanceUser,
-                                                    betPlay,
-                                                    betAmount,
-                                                    results[0].idplaygame,
-                                                    idbetPlay,
-                                                    "+NO"
-                                                );
+                                                console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "+NO");
                                                 let balanceNow = balanceUser + betAmount;
-                                                let balanceturnover = hasSimilarData(
-                                                    results[0].gameplayturn,
-                                                    productId,
-                                                    results[0].turnover,
-                                                    betPlay
-                                                );
+                                                let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
                                                 const post = {
-                                                    username: usernameGame,
-                                                    gameid: productId,
-                                                    bet: betPlay,
-                                                    win: betAmount,
-                                                    balance_credit: balanceNow,
-                                                    userAgent: userAgent,
-                                                    platform: userAgentt,
-                                                    namegame: namegame,
-                                                    trans_id: txnsGame[0].tokenplaygame,
+                                                    username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
                                                 };
                                                 let repost = repostGame.uploadLogRepostGame(post);
                                                 const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', roundId = '${roundId}',
@@ -413,24 +418,15 @@ http: exports.GameSettleBets = async (req, res) => {
                                                             timestampMillis: timestampMillis,
                                                             productId: productId,
                                                             currency: currency,
-                                                            balanceBefore:
-                                                                convertToTwoDecimalPlaces(balanceUser),
-                                                            balanceAfter:
-                                                                convertToTwoDecimalPlaces(balanceNow),
+                                                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                                            balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                             username: usernameGame,
                                                         });
                                                     }
                                                 });
                                             }
                                         } else {
-                                            console.log(
-                                                balanceUser,
-                                                betPlay,
-                                                betAmount,
-                                                results[0].idplaygame,
-                                                idbetPlay,
-                                                "Yes"
-                                            );
+                                            console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "Yes");
                                             let balanceNow = balanceUser - betPlay + betAmount;
                                             let balanceturnover = hasSimilarData(
                                                 results[0].gameplayturn,
@@ -440,15 +436,8 @@ http: exports.GameSettleBets = async (req, res) => {
                                             );
                                             //console.log("BetUp...." + betPlay, betAmount, balanceUser, balanceNow);
                                             const post = {
-                                                username: usernameGame,
-                                                gameid: productId,
-                                                bet: betPlay,
-                                                win: betAmount,
-                                                balance_credit: balanceNow,
-                                                userAgent: userAgent,
-                                                platform: userAgentt,
-                                                namegame: namegame,
-                                                trans_id: txnsGame[0].tokenplaygame,
+                                                username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
                                             };
                                             let repost = repostGame.uploadLogRepostGame(post);
                                             //console.log(balanceUser, balanceNow)
@@ -465,8 +454,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                         timestampMillis: timestampMillis,
                                                         productId: productId,
                                                         currency: currency,
-                                                        balanceBefore:
-                                                            convertToTwoDecimalPlaces(balanceUser),
+                                                        balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                         balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                         username: usernameGame,
                                                     });
@@ -476,31 +464,12 @@ http: exports.GameSettleBets = async (req, res) => {
                                     }
                                 } else if (betAmount !== 0 && balanceUser === 0) {
                                     if (results[0].idplaygame === idbetPlay) {
-                                        console.log(
-                                            balanceUser,
-                                            betPlay,
-                                            betAmount,
-                                            results[0].idplaygame,
-                                            idbetPlay,
-                                            "NO"
-                                        );
+                                        console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "NO");
                                         let balanceNow = balanceUser + betAmount;
-                                        let balanceturnover = hasSimilarData(
-                                            results[0].gameplayturn,
-                                            productId,
-                                            results[0].turnover,
-                                            betPlay
-                                        );
+                                        let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
                                         const post = {
-                                            username: usernameGame,
-                                            gameid: productId,
-                                            bet: betPlay,
-                                            win: betAmount,
-                                            balance_credit: balanceNow,
-                                            userAgent: userAgent,
-                                            platform: userAgentt,
-                                            namegame: namegame,
-                                            trans_id: txnsGame[0].tokenplaygame,
+                                            username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                            userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
                                         };
                                         let repost = repostGame.uploadLogRepostGame(post);
                                         const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
