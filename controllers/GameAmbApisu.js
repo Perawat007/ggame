@@ -356,7 +356,6 @@ http: exports.GameSettleBets = async (req, res) => {
                 console.log(error);
             } else {
                 if (resultsstart.length <= 0) {
-                    //console.log(resultsstart[0].roundId, roundId);
                     let splTestRound = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
                     connection.query(splTestRound, (error, resultRound) => {
                         if (error) {
@@ -580,7 +579,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                 res.status(201).json({
                                     tpyetest: "round = 3",
                                     id: id,
-                                    statusCode: 20002,
+                                    statusCode: 20001,
                                     timestampMillis: timestampMillis,
                                     productId: productId,
                                     balanceAfter: convertToTwoDecimalPlaces(resultsstart[0].credit),
