@@ -222,7 +222,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                             action: "GameidbetPlay_ON",
                         });
                     } else if (roundId === results[0].roundId) {
-                        if (productId === "918KISS") {
+                        if (productId === "918KISS" || productId === "NETENT2") {
                             let balanceNow = balanceUser - betPlay;
                             const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay + results[0].bet_latest}', idplaygame  = '${idbetPlay}',
                             actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N', roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
