@@ -618,6 +618,14 @@ http: exports.GameCancelBets = async (req, res) => {
                         if (productId === "918KISS") {
                             res.status(201).json({
                                 id: id,
+                                statusCode: 20002,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                action: 'Cbet>==/*0'
+                            });
+                        }else{
+                            res.status(201).json({
+                                id: id,
                                 statusCode: 0,
                                 timestampMillis: timestampMillis,
                                 productId: productId,
@@ -626,14 +634,6 @@ http: exports.GameCancelBets = async (req, res) => {
                                 balanceAfter: balanceUser,
                                 username: usernameGame,
                                 action: 'cancelBetActionVI'
-                            });
-                        }else{
-                            res.status(201).json({
-                                id: id,
-                                statusCode: 20002,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                                action: 'Cbet>==/*0'
                             });
                         }
                     }
