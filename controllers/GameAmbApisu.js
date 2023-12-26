@@ -200,7 +200,7 @@ http: exports.GamePlaceBets = async (req, res) => {
     const txnsGame = req.body.txns;
     const roundId = txnsGame[0].roundId;
 
-    let spl = `SELECT credit, turnover, roundId, idplaygame, actiongamenow FROM member 
+    let spl = `SELECT credit, turnover, roundId, idplaygame, actiongamenow, bet_latest FROM member 
     WHERE phonenumber ='${usernameGame}' AND status_delete='N' ORDER BY phonenumber ASC`;
     try {
         connection.query(spl, (error, results) => {
@@ -227,7 +227,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                     } else if (roundId === results[0].roundId) {
                         if (productId === "918KISS") {
                             let balanceNow = balanceUser - betPlay;
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay + results[0].bet_latest}', idplaygame  = '${idbetPlay}',
                             actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N', roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) {
