@@ -229,9 +229,16 @@ exports.PlaceBetSlotXo = async (req, res) => {
             });
           }
         } else {
-          res.status(201).json({
-            Error: "100",
-            Description: "Insufficient fund"
+          const sql_update = `UPDATE member set actiongamenow ='placeBetFail ', unsettleplay = 'N', 
+          winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                Error: "100",
+                Description: "Insufficient fund"
+              });
+            }
           });
         }
       }
