@@ -227,17 +227,25 @@ http: exports.GamePlaceBets = async (req, res) => {
                     } else if (roundId === results[0].roundId) {
                         if (productId === "918KISS") {
                             let balanceNow = balanceUser - betPlay;
-                            res.status(201).json({
-                                username: usernameGame,
-                                currency: currency,
-                                timestampMillis: timestampMillis,
-                                balanceBefore: balanceUser,
-                                balanceAfter: balanceNow,
-                                id: id,
-                                statusCode: 0,
-                                productId: productId,
-                                action: "GamePlaceBets_ON",
-                            });
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
+                            actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N', roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    res.status(201).json({
+                                        username: usernameGame,
+                                        currency: currency,
+                                        timestampMillis: timestampMillis,
+                                        balanceAfter: balanceNow,
+                                        balanceBefore: balanceUser,
+                                        id: id,
+                                        statusCode: 0,
+                                        productId: productId,
+                                        action: "GamePlaceBets_ON",
+                                    });
+                                }
+                            })
                         } else {
                             res.status(201).json({
                                 id: id,
@@ -633,7 +641,7 @@ http: exports.GameCancelBets = async (req, res) => {
                 if (results[0].bet_latest === 0 || results[0].bet_latest === 0.0) {
                     if (results[0].actiongamenow !== "settleBet") {
                         if (productId === "918KISS") {
-                            if (roundId === results[0].roundId){
+                            if (roundId === results[0].roundId) {
                                 res.status(201).json({
                                     id: id,
                                     statusCode: 20002,
@@ -641,7 +649,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                     productId: productId,
                                     action: 'Cbet>==/*0'
                                 });
-                            }else {
+                            } else {
                                 res.status(201).json({
                                     id: id,
                                     statusCode: 0,
@@ -654,7 +662,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                     action: 'cancelBetActionV'
                                 });
                             }
-                        }else{
+                        } else {
                             res.status(201).json({
                                 id: id,
                                 statusCode: 0,
@@ -746,7 +754,7 @@ http: exports.GameCancelBets = async (req, res) => {
                             }
                         });
                     } else {
-                        if (results[0].roundId === roundId){
+                        if (results[0].roundId === roundId) {
                             const balanceNow = balanceUser + results[0].bet_latest;
                             const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
                             WHERE phonenumber ='${usernameGame}'`;
