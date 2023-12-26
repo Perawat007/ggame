@@ -640,7 +640,7 @@ http: exports.GameCancelBets = async (req, res) => {
                 const betPlay = txnsGame[0].betAmount;
                 if (results[0].bet_latest === 0 || results[0].bet_latest === 0.0) {
                     if (results[0].actiongamenow !== "settleBet") {
-                        if (productId === "918KISS") {
+                        if (productId === "918KISS" || productId === "ACE333") {
                             if (roundId === results[0].roundId) {
                                 res.status(201).json({
                                     id: id,
