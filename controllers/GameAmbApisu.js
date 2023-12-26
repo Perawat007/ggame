@@ -628,7 +628,7 @@ http: exports.GameCancelBets = async (req, res) => {
                         }
                     });
                 } else {
-                    if (betPlay <= 0) {
+                    if (betPlay < 0) {
                         const balanceNow = balanceUser - results[0].bet_latest;
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
                         WHERE phonenumber ='${usernameGame}'`;
@@ -645,7 +645,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                     balanceBefore: balanceUser,
                                     balanceAfter: balanceNow,
                                     username: usernameGame,
-                                    action: 'Cbet<=0'
+                                    action: 'Cbet<0'
                                 });
                             }
                         });
