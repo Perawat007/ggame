@@ -196,35 +196,42 @@ exports.PlaceBetSlotXo = async (req, res) => {
       else {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        if (results[0].idplaygame === id) {
-          const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+        if (balanceUser < amount) {
+          if (results[0].idplaygame === id) {
+            const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
           winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
-          connection.query(sql_update, (error, resultsGame) => {
-            if (error) { console.log(error) }
-            else {
-              res.status(201).json({
-                Status: 0,
-                Message: "Success",
-                Username: usernameGame,
-                Balance: balanceUser,
-                action: 'idalready'
-              });
-            }
-          });
+            connection.query(sql_update, (error, resultsGame) => {
+              if (error) { console.log(error) }
+              else {
+                res.status(201).json({
+                  Status: 0,
+                  Message: "Success",
+                  Username: usernameGame,
+                  Balance: balanceUser,
+                  action: 'idalready'
+                });
+              }
+            });
+          } else {
+            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+          winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
+            connection.query(sql_update, (error, resultsGame) => {
+              if (error) { console.log(error) }
+              else {
+                res.status(201).json({
+                  Status: 0,
+                  Message: "Success",
+                  Username: usernameGame,
+                  Balance: balanceNow,
+                  action: 'idNOalready'
+                });
+              }
+            });
+          }
         } else {
-          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
-          winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
-          connection.query(sql_update, (error, resultsGame) => {
-            if (error) { console.log(error) }
-            else {
-              res.status(201).json({
-                Status: 0,
-                Message: "Success",
-                Username: usernameGame,
-                Balance: balanceNow,
-                action: 'idNOalready'
-              });
-            }
+          res.status(201).json({
+            Error: "100",
+            Description: "Insufficient fund"
           });
         }
       }
