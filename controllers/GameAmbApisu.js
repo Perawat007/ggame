@@ -395,7 +395,7 @@ http: exports.GameSettleBets = async (req, res) => {
                         if (error) {
                             console.log(error);
                         } else {
-                            if (resultsroundId.length === 1){
+                            if (resultsroundId.length === 0){
                                 let spl = `SELECT credit, turnover, gameplayturn, playgameuser, tokenplaygame, bet_latest, idplaygame, actiongamenow FROM member 
                                 WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
                                 connection.query(spl, (error, results) => {
