@@ -656,7 +656,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                     action: 'cancelBetActionV'
                                 });
                             }
-                        } else if (productId === "CQ9V2") {
+                        } else if (productId === "CQ9V2" || productId === "NETENT2") {
                             if (roundId === results[0].roundId) {
                                 res.status(201).json({
                                     id: id,
