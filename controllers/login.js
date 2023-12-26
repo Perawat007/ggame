@@ -189,27 +189,42 @@ exports.PlaceBetSlotXo = async (req, res) => {
   const gamecode = req.body.gamecode;
   const userAgent = req.headers['user-agent'];
 
-  let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const namegame = results[0].playgameuser;
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}'
-        WHERE phonenumber ='${usernameGame}'`;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              Status: 0,
-              Message: "Success",
-              Username: usernameGame,
-              Balance: balanceNow
-            });
-          }
-        });
+        if (results[0].roundId === roundid){
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+          winbonus ='N', roundId = '${roundid}' WHERE phonenumber ='${usernameGame}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                Status: 0,
+                Message: "Success",
+                Username: usernameGame,
+                Balance: balanceUser
+              });
+            }
+          });
+        } else {
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+          winbonus ='N', roundId = '${roundid}' WHERE phonenumber ='${usernameGame}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                Status: 0,
+                Message: "Success",
+                Username: usernameGame,
+                Balance: balanceNow
+              });
+            }
+          });
+        }
       }
     })
   } catch (err) {
