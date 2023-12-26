@@ -196,7 +196,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
       else {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        if (results[0].idplaygame === id){
+        if (results[0].idplaygame === id) {
           const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
           winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
           connection.query(sql_update, (error, resultsGame) => {
@@ -249,30 +249,47 @@ exports.SettlePlaySlotXo = async (req, res) => {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const namegame = results[0].playgameuser;
-        const balanceUser = parseFloat(results[0].credit);
-        const betPlay = results[0].bet_latest;
-        const balanceNow = balanceUser + amount;
-        let postTurnover = results[0].turnover - betPlay;
-        if (postTurnover < 0) { postTurnover = 0; }
-        let balanceturnover = hasSimilarData(results[0].gameplayturn, "SLOTXO", results[0].turnover, amount)
-        const post = {
-          username: usernameGame, gameid: "SLOTXO", bet: betPlay, win: amount, balance_credit: balanceNow,
-          userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame, roundId: roundid, balancebefore: balanceUser
-        }
-        let repost = repostGame.uploadLogRepostGame(post)
-        const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE phonenumber ='${usernameGame}' `;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              Status: 0,
-              Message: "Success",
-              Username: usernameGame,
-              Balance: balanceNow
-            });
+        let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundid}'`;
+        connection.query(splroundId, (error, resultsroundId) => {
+          if (error) {
+            console.log(error);
+          } else {
+            if (resultsroundId.length === 0) {
+              const namegame = results[0].playgameuser;
+              const balanceUser = parseFloat(results[0].credit);
+              const betPlay = results[0].bet_latest;
+              const balanceNow = balanceUser + amount;
+              let postTurnover = results[0].turnover - betPlay;
+              if (postTurnover < 0) { postTurnover = 0; }
+              let balanceturnover = hasSimilarData(results[0].gameplayturn, "SLOTXO", results[0].turnover, amount)
+              const post = {
+                username: usernameGame, gameid: "SLOTXO", bet: betPlay, win: amount, balance_credit: balanceNow,
+                userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame, roundId: roundid, balancebefore: balanceUser
+              }
+              let repost = repostGame.uploadLogRepostGame(post)
+              const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE phonenumber ='${usernameGame}' `;
+              connection.query(sql_update, (error, resultsGame) => {
+                if (error) { console.log(error) }
+                else {
+                  res.status(201).json({
+                    Status: 0,
+                    Message: "Success",
+                    Username: usernameGame,
+                    Balance: balanceNow
+                  });
+                }
+              });
+            } else {
+              const balanceUser = parseFloat(results[0].credit);
+              res.status(201).json({
+                Status: 0,
+                Message: "Success",
+                Username: usernameGame,
+                Balance: balanceUser
+              });
+            }
           }
-        });
+        })
       }
     })
   } catch (err) {
@@ -763,7 +780,7 @@ exports.PlayerBetJili = async (req, res) => {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        if (results[0].roundId === round){
+        if (results[0].roundId === round) {
           res.status(201).json({
             errorCode: 1,
             message: "Already accepted",
@@ -784,9 +801,9 @@ exports.PlayerBetJili = async (req, res) => {
               userAgent: userAgent, platform: userAgent, namegame: namegame
             }
             let repost = repostGame.uploadLogRepostGame(post)
-  
+
             let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
-  
+
             const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}',
             roundId = '${round}' WHERE phonenumber ='${results[0].username}'`;
             connection.query(sql_update, (error, resultsGame) => {
@@ -831,7 +848,7 @@ exports.CancelBetJili = async (req, res) => {
             message: "Not enough balance",
           });
         } else {
-          if (results[0].idplaygame !== reqId){
+          if (results[0].idplaygame !== reqId) {
             const balanceUser = parseFloat(results[0].credit);
             if (winloseAmount !== 0) {
               const balanceNow = balanceUser - betAmount;
