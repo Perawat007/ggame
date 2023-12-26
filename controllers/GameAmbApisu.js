@@ -346,7 +346,7 @@ http: exports.GameSettleBets = async (req, res) => {
     const userAgentt = req.useragent;
     const roundId = txnsGame[0].roundId;
     const betAmount = txnsGame[0].payoutAmount;
-    //const betPlay = txnsGame[0].betAmount;
+    const betPlay = txnsGame[0].betAmount;
     let splTest = `SELECT credit, roundId FROM member 
     WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND roundId = '${roundId}' AND status = 'Y'`;
 
@@ -363,7 +363,6 @@ http: exports.GameSettleBets = async (req, res) => {
                         if (error) {
                             console.log(error);
                         } else {
-                            let betPlay = results[0].bet_latest;
                             if (results[0].actiongamenow === "cancelBet") {
                                 const sql_update = `UPDATE member set bet_latest='${0.01}' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
@@ -479,7 +478,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                             };
                                             let repost = repostGame.uploadLogRepostGame(post);
                                             //console.log(balanceUser, balanceNow)
-                                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', turnover='${balanceturnover}',
+                                            const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
                                             roundId = '${roundId}', idplaygame  = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
 
                                             connection.query(sql_update, (error, resultsGame) => {
