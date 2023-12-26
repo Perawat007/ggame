@@ -197,7 +197,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
         const namegame = results[0].playgameuser;
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
+        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}'
         WHERE phonenumber ='${usernameGame}'`;
         connection.query(sql_update, (error, resultsGame) => {
           if (error) { console.log(error) }
@@ -244,7 +244,7 @@ exports.SettlePlaySlotXo = async (req, res) => {
           userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame
         }
         let repost = repostGame.uploadLogRepostGame(post)
-        const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
+        const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE phonenumber ='${usernameGame}' `;
         connection.query(sql_update, (error, resultsGame) => {
           if (error) { console.log(error) }
           else {
