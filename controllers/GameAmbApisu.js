@@ -577,7 +577,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                     statusCode: 20002,
                                     timestampMillis: timestampMillis,
                                     productId: productId,
-                                    balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                    balanceAfter: convertToTwoDecimalPlaces(resultsstart[0].credit),
                                 });
                             }
                         }
