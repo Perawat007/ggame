@@ -646,7 +646,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                             balanceBefore: resultsroundId[0].balance_credit,
                                             balanceAfter: resultsroundId[0].balancebefore + resultsroundId[0].bet,
                                             username: usernameGame,
-                                            action: 'Cbet>=0'
+                                            action: 'Cbet>==0'
                                         });
                                     }
                                 });
@@ -702,26 +702,48 @@ http: exports.GameCancelBets = async (req, res) => {
                             }
                         });
                     } else {
-                        const balanceNow = balanceUser + results[0].bet_latest;
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
-                        WHERE phonenumber ='${usernameGame}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
+                        let splroundId = `SELECT balancebefore, balance_credit, bet FROM repostgame WHERE roundId  ='${roundId}'`;
+                        connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
                                 console.log(error);
                             } else {
-                                res.status(201).json({
-                                    id: id,
-                                    statusCode: 0,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
-                                    currency: currency,
-                                    balanceBefore: balanceUser,
-                                    balanceAfter: balanceNow,
-                                    username: usernameGame,
-                                    action: 'Cbet>=0'
-                                });
+                                if (resultsroundId.length === 1){
+                                    const balanceNow = balanceUser + results[0].bet_latest;
+                                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
+                                    WHERE phonenumber ='${usernameGame}'`;
+                                    connection.query(sql_update, (error, resultsGame) => {
+                                        if (error) {
+                                            console.log(error);
+                                        } else {
+                                            res.status(201).json({
+                                                id: id,
+                                                statusCode: 0,
+                                                timestampMillis: timestampMillis,
+                                                productId: productId,
+                                                currency: currency,
+                                                balanceBefore: balanceUser,
+                                                balanceAfter: balanceNow,
+                                                username: usernameGame,
+                                                action: 'Cbet>=0'
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    res.status(201).json({
+                                        id: id,
+                                        statusCode: 0,
+                                        timestampMillis: timestampMillis,
+                                        productId: productId,
+                                        currency: currency,
+                                        balanceBefore: balanceUser,
+                                        balanceAfter: balanceUser,
+                                        username: usernameGame,
+                                        action: 'Cbet>=0'
+                                    });
+                                }
                             }
                         });
+                       
                     }
                 }
             }
