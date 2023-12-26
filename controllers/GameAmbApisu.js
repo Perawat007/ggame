@@ -615,14 +615,27 @@ http: exports.GameCancelBets = async (req, res) => {
                 const betPlay = txnsGame[0].betAmount;
                 if (results[0].bet_latest === 0 || results[0].bet_latest === 0.0) {
                     if (results[0].actiongamenow !== "settleBet") {
-                        res.status(201).json({
-                            id: id,
-                            statusCode: 20002,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                        });
-                    } else {
-
+                        if (productId === "918KISS") {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 0,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                currency: currency,
+                                balanceBefore: balanceUser,
+                                balanceAfter: balanceUser,
+                                username: usernameGame,
+                                action: 'cancelBetActionVI'
+                            });
+                        }else{
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 20002,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                action: 'Cbet>==/*0'
+                            });
+                        }
                     }
                 } else if (results[0].actiongamenow === "settleBet" || results[0].actiongamenow === "settleBetWin") {
                     if (productId === "918KISS") {
