@@ -863,22 +863,28 @@ http: exports.GameUnsettleBets = async (req, res) => {
                 if (results[0].unsettleplay === 'N') {
                     const balanceUser = parseFloat(results[0].credit);
                     let balanceAfter = balanceUser - payoutAmount;
-
+                    const deleteQuery = `DELETE FROM repostgame WHERE roundId  ='${roundId}'`;
                     const sql_update = `UPDATE member set credit='${balanceAfter}',bet_latest='${txnsGame[0].betAmount}',
                     unsettleplay = 'Y' WHERE phonenumber ='${usernameGame}'`;
-                    connection.query(sql_update, (error, resultsgg) => {
+                    connection.query(deleteQuery, (error, resultsdelete) => {
                         if (error) {
                             console.log(error);
                         } else {
-                            res.status(201).json({
-                                id: id,
-                                statusCode: 0,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                                currency: currency,
-                                balanceBefore: balanceUser,
-                                balanceAfter: balanceAfter,
-                                username: usernameGame,
+                            connection.query(sql_update, (error, resultsgg) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    res.status(201).json({
+                                        id: id,
+                                        statusCode: 0,
+                                        timestampMillis: timestampMillis,
+                                        productId: productId,
+                                        currency: currency,
+                                        balanceBefore: balanceUser,
+                                        balanceAfter: balanceAfter,
+                                        username: usernameGame,
+                                    });
+                                }
                             });
                         }
                     });
