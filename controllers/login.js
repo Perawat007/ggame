@@ -213,23 +213,40 @@ exports.PlaceBetSlotXo = async (req, res) => {
               }
             });
           } else {
-            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
-          winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
-            connection.query(sql_update, (error, resultsGame) => {
-              if (error) { console.log(error) }
-              else {
-                res.status(201).json({
-                  Status: 0,
-                  Message: "Success",
-                  Username: usernameGame,
-                  Balance: balanceNow,
-                  action: 'idNOalready'
+            if (results[0].actiongamenow != 'CancelNotSave'){
+              const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+              winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
+                connection.query(sql_update, (error, resultsGame) => {
+                  if (error) { console.log(error) }
+                  else {
+                    res.status(201).json({
+                      Status: 0,
+                      Message: "Success",
+                      Username: usernameGame,
+                      Balance: balanceNow,
+                      action: 'idNOalready'
+                    });
+                  }
                 });
-              }
-            });
+            } else {
+              const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBetNotSave', unsettleplay = 'N', 
+              winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
+                connection.query(sql_update, (error, resultsGame) => {
+                  if (error) { console.log(error) }
+                  else {
+                    res.status(201).json({
+                      Status: 0,
+                      Message: "Success",
+                      Username: usernameGame,
+                      Balance: balanceUser,
+                      action: 'idalready'
+                    });
+                  }
+                });
+            }
           }
         } else {
-          const sql_update = `UPDATE member set actiongamenow ='placeBetFail ', unsettleplay = 'N', 
+          const sql_update = `UPDATE member set actiongamenow ='placeBetFail', unsettleplay = 'N', 
           winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
@@ -323,7 +340,7 @@ exports.CancelPlaySlotXo = async (req, res) => {
       else {
         if (results[0].idplaygame === id) {
           const balanceUser = parseFloat(results[0].credit);
-          const sql_update = `UPDATE member set credit='${balanceUser}' WHERE phonenumber ='${usernameGame}'`;
+          const sql_update = `UPDATE member set credit='${balanceUser}', actiongamenow ='Cancel' WHERE phonenumber ='${usernameGame}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
             else {
@@ -340,7 +357,7 @@ exports.CancelPlaySlotXo = async (req, res) => {
             const balanceUser = parseFloat(results[0].credit);
             const betPlay = parseFloat(results[0].bet_latest);
             let balanceNow = balanceUser + betPlay;
-            const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${id}' WHERE phonenumber ='${usernameGame}'`;
+            const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${id}', actiongamenow ='CancelSave' WHERE phonenumber ='${usernameGame}'`;
             connection.query(sql_update, (error, resultsGame) => {
               if (error) { console.log(error) }
               else {
@@ -354,7 +371,7 @@ exports.CancelPlaySlotXo = async (req, res) => {
             });
           } else {
             const balanceUser = parseFloat(results[0].credit);
-            const sql_update = `UPDATE member set credit='${balanceUser}' WHERE phonenumber ='${usernameGame}'`;
+            const sql_update = `UPDATE member set credit='${balanceUser}', actiongamenow ='CancelNotSave' WHERE phonenumber ='${usernameGame}'`;
             connection.query(sql_update, (error, resultsGame) => {
               if (error) { console.log(error) }
               else {
