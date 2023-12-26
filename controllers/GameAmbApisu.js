@@ -374,7 +374,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                 res.status(201).json({
                                     tpyetest: "round = 3",
                                     id: id,
-                                    statusCode: 20002,
+                                    statusCode: 20001,
                                     timestampMillis: timestampMillis,
                                     productId: productId,
                                     balanceAfter: convertToTwoDecimalPlaces(balanceUser),
@@ -577,7 +577,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                 });
                             } else {
                                 res.status(201).json({
-                                    tpyetest: "round = 3",
+                                    tpyetest: "round = 4",
                                     id: id,
                                     statusCode: 20002,
                                     timestampMillis: timestampMillis,
