@@ -197,15 +197,6 @@ exports.PlaceBetSlotXo = async (req, res) => {
         const namegame = results[0].playgameuser;
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        let postTurnover = results[0].turnover - amount;
-        if (postTurnover < 0) { postTurnover = 0; }
-        const post = {
-          username: usernameGame, gameid: "SLOTXO", bet: amount, win: 0, balance_credit: balanceNow,
-          userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame
-        }
-        let balanceturnover = hasSimilarData(results[0].gameplayturn, "SLOTXO", results[0].turnover, amount)
-
-        let repost = repostGame.uploadLogRepostGameAsk(post)
         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
         WHERE phonenumber ='${usernameGame}'`;
         connection.query(sql_update, (error, resultsGame) => {
@@ -236,20 +227,24 @@ exports.SettlePlaySlotXo = async (req, res) => {
   const timestamp = req.body.timestamp;
   const roundid = req.body.roundid;
 
-  let spl = `SELECT credit, playgameuser FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, playgameuser, bet_latest, turnover FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const namegame = results[0].playgameuser;
         const balanceUser = parseFloat(results[0].credit);
+        const betPlay = results[0].bet_latest;
         const balanceNow = balanceUser + amount;
+        let postTurnover = results[0].turnover - betPlay;
+        if (postTurnover < 0) { postTurnover = 0; }
+        let balanceturnover = hasSimilarData(results[0].gameplayturn, "SLOTXO", results[0].turnover, amount)
         const post = {
-          username: usernameGame, gameid: "SLOTXO", bet: 0, win: amount, balance_credit: balanceNow,
+          username: usernameGame, gameid: "SLOTXO", bet: betPlay, win: amount, balance_credit: balanceNow,
           userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame
         }
-        let repost = repostGame.uploadLogRepostGameAsk(post)
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${usernameGame}'`;
+        let repost = repostGame.uploadLogRepostGame(post)
+        const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
         connection.query(sql_update, (error, resultsGame) => {
           if (error) { console.log(error) }
           else {
@@ -273,12 +268,15 @@ http://localhost:5000/post/cancel-bet
 exports.CancelPlaySlotXo = async (req, res) => {
   const usernameGame = req.body.username;
 
-  let spl = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
+        const betPlay = parseFloat(results[0].bet_latest);
+        let balanceNow = balanceUser - betPlay;
+        const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
         connection.query(sql_update, (error, resultsGame) => {
           if (error) { console.log(error) }
           else {
@@ -286,7 +284,7 @@ exports.CancelPlaySlotXo = async (req, res) => {
               Status: 0,
               Message: "Success",
               Username: usernameGame,
-              Balance: balanceUser
+              Balance: balanceNow
             });
           }
         });
