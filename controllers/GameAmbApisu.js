@@ -605,7 +605,7 @@ http: exports.GameCancelBets = async (req, res) => {
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
     const roundId = txnsGame[0].roundId
-    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, actiongamenow, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) {
@@ -702,32 +702,13 @@ http: exports.GameCancelBets = async (req, res) => {
                             }
                         });
                     } else {
-                        let splroundId = `SELECT balancebefore, balance_credit, bet FROM repostgame WHERE roundId  ='${roundId}'`;
-                        connection.query(splroundId, (error, resultsroundId) => {
-                            if (error) {
-                                console.log(error);
-                            } else {
-                                if (resultsroundId.length === 1){
-                                    const balanceNow = balanceUser + results[0].bet_latest;
-                                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
-                                    WHERE phonenumber ='${usernameGame}'`;
-                                    connection.query(sql_update, (error, resultsGame) => {
-                                        if (error) {
-                                            console.log(error);
-                                        } else {
-                                            res.status(201).json({
-                                                id: id,
-                                                statusCode: 0,
-                                                timestampMillis: timestampMillis,
-                                                productId: productId,
-                                                currency: currency,
-                                                balanceBefore: balanceUser,
-                                                balanceAfter: balanceNow,
-                                                username: usernameGame,
-                                                action: 'Cbet>=0'
-                                            });
-                                        }
-                                    });
+                        if (results[0].roundId === roundId){
+                            const balanceNow = balanceUser + results[0].bet_latest;
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
+                            WHERE phonenumber ='${usernameGame}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) {
+                                    console.log(error);
                                 } else {
                                     res.status(201).json({
                                         id: id,
@@ -736,14 +717,25 @@ http: exports.GameCancelBets = async (req, res) => {
                                         productId: productId,
                                         currency: currency,
                                         balanceBefore: balanceUser,
-                                        balanceAfter: balanceUser,
+                                        balanceAfter: balanceNow,
                                         username: usernameGame,
                                         action: 'Cbet>=0'
                                     });
                                 }
-                            }
-                        });
-                       
+                            });
+                        } else {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 0,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                currency: currency,
+                                balanceBefore: balanceUser,
+                                balanceAfter: balanceUser,
+                                username: usernameGame,
+                                action: 'Cbet>=0'
+                            });
+                        }
                     }
                 }
             }
