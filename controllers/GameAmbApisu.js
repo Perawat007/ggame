@@ -234,7 +234,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                         if (betPlay <= 0) {
                             let balanceNow = balanceUser + betPlay;
                             const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                            actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N' WHERE phonenumber ='${usernameGame}'`;
+                            actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N', roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) {
                                     console.log(error);
@@ -257,7 +257,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                         } else {
                             if (results[0].actiongamenow === 'cancelBetNoupdate') {
                                 const sql_update = `UPDATE member set bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                                actiongamenow ='placeBetNoupdate', unsettleplay = 'N', winbonus ='N' WHERE phonenumber ='${usernameGame}'`;
+                                actiongamenow ='placeBetNoupdate', unsettleplay = 'N', winbonus ='N', roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) {
                                         console.log(error);
@@ -278,7 +278,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                             } else {
                                 let balanceNow = balanceUser - betPlay;
                                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', idplaygame  = '${idbetPlay}',
-                                actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N' WHERE phonenumber ='${usernameGame}'`;
+                                actiongamenow ='placeBet', unsettleplay = 'N', winbonus ='N', roundId = '${roundId}' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) {
                                         console.log(error);
@@ -356,9 +356,42 @@ http: exports.GameSettleBets = async (req, res) => {
                 console.log(error);
             } else {
                 if (resultsstart.length <= 0) {
+                        //console.log(resultsstart[0].roundId, roundId);
+                        const balanceUser = parseFloat(resultsstart[0].credit);
+                        if (productId === "CQ9V2" || productId === "ACE333") {
+                            res.status(201).json({
+                                tpyetest: "round = 2",
+                                id: id,
+                                statusCode: 20002,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                            });
+                        } else if (productId === "918KISS") {
+                            res.status(201).json({
+                                tpyetest: "round = 3",
+                                id: id,
+                                statusCode: 20002,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                            });
+                        } else {
+                            res.status(201).json({
+                                tpyetest: "round = 1",
+                                id: id,
+                                statusCode: 0,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                currency: currency,
+                                balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                username: usernameGame,
+                            });
+                        }
+    
+                } else {
                     let spl = `SELECT credit, turnover, gameplayturn, playgameuser, tokenplaygame, bet_latest, idplaygame, actiongamenow FROM member 
                     WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
-
                     connection.query(spl, (error, results) => {
                         if (error) {
                             console.log(error);
@@ -531,39 +564,6 @@ http: exports.GameSettleBets = async (req, res) => {
                             }
                         }
                     });
-                } else {
-                    //console.log(resultsstart[0].roundId, roundId);
-                    const balanceUser = parseFloat(resultsstart[0].credit);
-                    if (productId === "CQ9V2" || productId === "ACE333") {
-                        res.status(201).json({
-                            tpyetest: "round = 2",
-                            id: id,
-                            statusCode: 20002,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                        });
-                    } else if (productId === "918KISS") {
-                        res.status(201).json({
-                            tpyetest: "round = 3",
-                            id: id,
-                            statusCode: 20002,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                            balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                        });
-                    } else {
-                        res.status(201).json({
-                            tpyetest: "round = 1",
-                            id: id,
-                            statusCode: 0,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                            currency: currency,
-                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                            balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                            username: usernameGame,
-                        });
-                    }
                 }
             }
         });
