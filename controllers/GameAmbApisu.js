@@ -398,20 +398,12 @@ http: exports.GameSettleBets = async (req, res) => {
                                     } else {
                                         if (results[0].idplaygame === idbetPlay) {
                                             if (betAmount <= 0) {
-                                                console.log(
-                                                    balanceUser,
-                                                    betPlay,
-                                                    betAmount,
-                                                    results[0].idplaygame,
-                                                    idbetPlay,
-                                                    "-NO"
-                                                );
                                                 let balanceNow = balanceUser - betAmount;
-                                                let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
+                                                let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, results[0].bet_latest);
                                                 const post = {
-                                                    username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                    username: usernameGame, gameid: productId, bet: results[0].bet_latest, win: betAmount, balance_credit: balanceNow,
                                                     userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
-                                                    roundId: roundId
+                                                    roundId: roundId, balancebefore: balanceUser
                                                 };
                                                 let repost = repostGame.uploadLogRepostGame(post);
                                                 const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',roundId = '${roundId}',
@@ -427,22 +419,20 @@ http: exports.GameSettleBets = async (req, res) => {
                                                             timestampMillis: timestampMillis,
                                                             productId: productId,
                                                             currency: currency,
-                                                            balanceBefore:
-                                                                convertToTwoDecimalPlaces(balanceUser),
-                                                            balanceAfter:
-                                                                convertToTwoDecimalPlaces(balanceNow),
+                                                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                                            balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                             username: usernameGame,
                                                         });
                                                     }
                                                 });
                                             } else {
-                                                console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "+NO");
+                                                //console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "+NO");
                                                 let balanceNow = balanceUser + betAmount;
-                                                let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
+                                                let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, results[0].bet_latest);
                                                 const post = {
-                                                    username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                    username: usernameGame, gameid: productId, bet: results[0].bet_latest, win: betAmount, balance_credit: balanceNow,
                                                     userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
-                                                    roundId: roundId
+                                                    roundId: roundId, balancebefore: balanceUser
                                                 };
                                                 let repost = repostGame.uploadLogRepostGame(post);
                                                 const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', roundId = '${roundId}',
@@ -467,17 +457,13 @@ http: exports.GameSettleBets = async (req, res) => {
                                         } else {
                                             console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "Yes");
                                             let balanceNow = balanceUser - betPlay + betAmount;
-                                            let balanceturnover = hasSimilarData(
-                                                results[0].gameplayturn,
-                                                productId,
-                                                results[0].turnover,
-                                                betPlay
+                                            let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, results[0].bet_latest
                                             );
                                             //console.log("BetUp...." + betPlay, betAmount, balanceUser, balanceNow);
                                             const post = {
-                                                username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                                username: usernameGame, gameid: productId, bet: results[0].bet_latest, win: betAmount, balance_credit: balanceNow,
                                                 userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
-                                                roundId: roundId
+                                                roundId: roundId, balancebefore: balanceUser
                                             };
                                             let repost = repostGame.uploadLogRepostGame(post);
                                             //console.log(balanceUser, balanceNow)
@@ -506,11 +492,11 @@ http: exports.GameSettleBets = async (req, res) => {
                                     if (results[0].idplaygame === idbetPlay) {
                                         console.log(balanceUser, betPlay, betAmount, results[0].idplaygame, idbetPlay, "NO");
                                         let balanceNow = balanceUser + betAmount;
-                                        let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, betPlay);
+                                        let balanceturnover = hasSimilarData(results[0].gameplayturn, productId, results[0].turnover, results[0].bet_latest);
                                         const post = {
-                                            username: usernameGame, gameid: productId, bet: betPlay, win: betAmount, balance_credit: balanceNow,
+                                            username: usernameGame, gameid: productId, bet: results[0].bet_latest, win: betAmount, balance_credit: balanceNow,
                                             userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnsGame[0].tokenplaygame,
-                                            roundId: roundId
+                                            roundId: roundId, balancebefore: balanceUser
                                         };
                                         let repost = repostGame.uploadLogRepostGame(post);
                                         const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
@@ -595,7 +581,7 @@ http: exports.GameCancelBets = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
-
+    const roundId = txnsGame[0].roundId
     let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -617,26 +603,32 @@ http: exports.GameCancelBets = async (req, res) => {
                     }
                 } else if (results[0].actiongamenow === "settleBet" || results[0].actiongamenow === "settleBetWin") {
                     if (productId === "918KISS") {
-                        const balanceNow = balanceUser + results[0].bet_latest;
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
-                        WHERE phonenumber ='${usernameGame}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
+                        let splroundId = `SELECT balancebefore, balance_credit FROM repostgame WHERE roundId  ='${roundId}'`;
+                        connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
                                 console.log(error);
                             } else {
-                                res.status(201).json({
-                                    id: id,
-                                    statusCode: 0,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
-                                    currency: currency,
-                                    balanceBefore: balanceUser,
-                                    balanceAfter: balanceNow,
-                                    username: usernameGame,
-                                    action: 'Cbet>=0'
+                                const sql_update = `UPDATE member set credit='${resultsroundId[0].balancebefore}',bet_latest='${0.0}', actiongamenow ='cancelBet'
+                                WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            balanceBefore: resultsroundId[0].balance_credit,
+                                            balanceAfter: resultsroundId[0].balancebefore,
+                                            username: usernameGame,
+                                            action: 'Cbet>=0'
+                                        });
+                                    }
                                 });
                             }
-                        });
+                        })
                     } else {
                         res.status(201).json({
                             id: id,
@@ -1093,7 +1085,8 @@ http: exports.GameBetCQ9 = async (req, res) => {
                 const amountGame = parseFloat(amount);
                 const balanceNow = balanceUser - amountGame;
                 const namegame = results[0].playgameuser;
-                const post = {username: usernameGame, gameid: "CQ9V2",
+                const post = {
+                    username: usernameGame, gameid: "CQ9V2",
                     bet: amountGame,
                     win: 0,
                     balance_credit: balanceNow,
@@ -1101,7 +1094,8 @@ http: exports.GameBetCQ9 = async (req, res) => {
                     platform: userAgent,
                     trans_id: mtcode,
                     namegame: namegame,
-                    roundId: roundid
+                    roundId: roundid,
+                    balancebefore: balanceUser
                 };
                 let repost = repostGame.uploadLogRepostGameAsk(post);
 
@@ -1167,7 +1161,8 @@ http: exports.GameEndRoundCQ9 = async (req, res) => {
                     userAgent: userAgent,
                     platform: userAgent,
                     trans_id: mtcode,
-                    roundId: roundid
+                    roundId: roundid,
+                    balancebefore: balanceUser
                 };
                 let repost = repostGame.uploadLogRepostGameAsk(post);
 

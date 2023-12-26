@@ -67,9 +67,10 @@ module.exports = class Post {
 
                     promotiontoonta.user_Leaked_promotion(post)
                     let datausername = result[0];
-                    let sql_before = `INSERT INTO repostgame (iduser, username, gameid, namegame, bet, win, balance_credit, get_browser, platform, trans_id, created_atdate, created_attime, roundId ) value 
+                    let sql_before = `INSERT INTO repostgame (iduser, username, gameid, namegame, bet, win, balance_credit, get_browser, platform, 
+                        trans_id, created_atdate, created_attime, roundId, balancebefore) value 
               ('${datausername.id}','${post.username}','${post.gameid}','${post.namegame}','${post.bet}','${post.win}','${post.balance_credit}',
-              '${browser}','${platform}','${post.trans_id}','${formattedDate}','${formattedTime}','${post.roundId}')`;
+              '${browser}','${platform}','${post.trans_id}','${formattedDate}','${formattedTime}','${post.roundId}', '${post.balancebefore}')`;
                     connection.query(sql_before, (error, resultAfter) => {
                         if (error) { console.log(error); }
                         else {
