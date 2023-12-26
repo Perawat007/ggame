@@ -356,46 +356,52 @@ http: exports.GameSettleBets = async (req, res) => {
                 console.log(error);
             } else {
                 if (resultsstart.length <= 0) {
-                        //console.log(resultsstart[0].roundId, roundId);
-                        const balanceUser = parseFloat(resultsstart[0].credit);
-                        if (productId === "CQ9V2" || productId === "ACE333") {
-                            res.status(201).json({
-                                tpyetest: "round = 2",
-                                id: id,
-                                statusCode: 20002,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                            });
-                        } else if (productId === "918KISS") {
-                            res.status(201).json({
-                                tpyetest: "round = 3",
-                                id: id,
-                                statusCode: 20002,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                                balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                            });
+                    //console.log(resultsstart[0].roundId, roundId);
+                    let splTestRound = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
+                    connection.query(splTestRound, (error, resultRound) => {
+                        if (error) {
+                            console.log(error);
                         } else {
-                            res.status(201).json({
-                                tpyetest: "round = 1",
-                                id: id,
-                                statusCode: 0,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                                currency: currency,
-                                balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                                balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                                username: usernameGame,
-                            });
+                            const balanceUser = parseFloat(resultRound[0].credit);
+                            if (productId === "CQ9V2" || productId === "ACE333") {
+                                res.status(201).json({
+                                    tpyetest: "round = 2",
+                                    id: id,
+                                    statusCode: 20002,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                });
+                            } else if (productId === "918KISS") {
+                                res.status(201).json({
+                                    tpyetest: "round = 3",
+                                    id: id,
+                                    statusCode: 20002,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                });
+                            } else {
+                                res.status(201).json({
+                                    tpyetest: "round = 1",
+                                    id: id,
+                                    statusCode: 0,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    currency: currency,
+                                    balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                    balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                    username: usernameGame,
+                                });
+                            }
                         }
-    
+                    });
                 } else {
                     let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundId}'`;
                     connection.query(splroundId, (error, resultsroundId) => {
                         if (error) {
                             console.log(error);
                         } else {
-                            if (resultsroundId.length === 0){
+                            if (resultsroundId.length === 0) {
                                 let spl = `SELECT credit, turnover, gameplayturn, playgameuser, tokenplaygame, bet_latest, idplaygame, actiongamenow FROM member 
                                 WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
                                 connection.query(spl, (error, results) => {
@@ -447,7 +453,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                             let repost = repostGame.uploadLogRepostGame(post);
                                                             const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',roundId = '${roundId}',
                                                             idplaygame = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
-            
+
                                                             connection.query(sql_update, (error, resultsGame) => {
                                                                 if (error) {
                                                                     console.log(error);
@@ -508,7 +514,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                         //console.log(balanceUser, balanceNow)
                                                         const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
                                                         roundId = '${roundId}', idplaygame  = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
-            
+
                                                         connection.query(sql_update, (error, resultsGame) => {
                                                             if (error) {
                                                                 console.log(error);
@@ -540,7 +546,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                     let repost = repostGame.uploadLogRepostGame(post);
                                                     const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
                                                     roundId = '${roundId}', idplaygame  = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
-            
+
                                                     connection.query(sql_update, (error, resultsGame) => {
                                                         if (error) {
                                                             console.log(error);
