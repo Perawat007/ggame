@@ -212,9 +212,6 @@ http: exports.GamePlaceBets = async (req, res) => {
                 const balanceUser = parseFloat(results[0].credit);
                 const betPlay = txnsGame[0].betAmount;
                 const idbetPlay = txnsGame[0].id;
-
-                //console.log(roundId, results[0].roundId, "setBet");
-                //console.log(balanceUser, betPlay, 'GamePlaceBets');
                 if (balanceUser >= 0 && balanceUser >= betPlay) {
                     if (idbetPlay === results[0].idplaygame) {
                         res.status(201).json({
@@ -274,8 +271,6 @@ http: exports.GamePlaceBets = async (req, res) => {
                                         balanceBefore: balanceUser,
                                         balanceAfter: balanceNow,
                                         action: "GamePlaceBets_ON",
-                                        idbetPlayO: idbetPlay,
-                                        idbetPlay: results[0].idplaygame,
                                     });
                                 }
                             });
@@ -373,8 +368,7 @@ http: exports.GameSettleBets = async (req, res) => {
     const betAmount = txnsGame[0].payoutAmount;
     const betPlay = txnsGame[0].betAmount;
     let splTest = `SELECT credit, roundId FROM member 
-    WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND roundId = '${roundId}' AND status = 'Y'`;
-
+        WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND roundId = '${roundId}' AND status = 'Y'`;
     try {
         connection.query(splTest, (error, resultsstart) => {
             if (error) {
@@ -870,7 +864,7 @@ http: exports.GameUnsettleBets = async (req, res) => {
                     const balanceUser = parseFloat(results[0].credit);
                     let balanceAfter = balanceUser - payoutAmount;
 
-                    const sql_update = `UPDATE member set credit='${balanceAfter}',bet_latest='${txnsGame[0].betAmount}', roundId = '11111111111111',
+                    const sql_update = `UPDATE member set credit='${balanceAfter}',bet_latest='${txnsGame[0].betAmount}',
                     unsettleplay = 'Y' WHERE phonenumber ='${usernameGame}'`;
                     connection.query(sql_update, (error, resultsgg) => {
                         if (error) {
