@@ -196,7 +196,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
       else {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        if (balanceUser < amount) {
+        if (balanceUser > amount) {
           if (results[0].idplaygame === id) {
             const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
           winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
