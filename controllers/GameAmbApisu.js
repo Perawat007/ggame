@@ -313,8 +313,6 @@ http: exports.GamePlaceBets = async (req, res) => {
                                             balanceBefore: balanceUser,
                                             balanceAfter: balanceNow,
                                             action: "GamePlaceBets_ON",
-                                            idbetPlayO: idbetPlay,
-                                            idbetPlay: results[0].idplaygame,
                                         });
                                     }
                                 });
@@ -666,17 +664,24 @@ http: exports.GameCancelBets = async (req, res) => {
                                     action: 'Cbet>==/*0CQ9V2'
                                 });
                             } else {
-                                res.status(201).json({
-                                    id: id,
-                                    statusCode: 0,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
-                                    currency: currency,
-                                    balanceBefore: balanceUser,
-                                    balanceAfter: balanceUser,
-                                    username: usernameGame,
-                                    action: 'cancelBetActionVCQ9V2'
-                                });
+                                const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_updateaction, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            balanceBefore: balanceUser,
+                                            balanceAfter: balanceUser,
+                                            username: usernameGame,
+                                            action: 'cancelBetActionVCQ9V2'
+                                        });
+                                    }
+                                })
                             }
                         } else {
                             res.status(201).json({
