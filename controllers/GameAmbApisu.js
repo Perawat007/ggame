@@ -222,14 +222,31 @@ http: exports.GamePlaceBets = async (req, res) => {
                             statusCode: 20002,
                             timestampMillis: timestampMillis,
                             productId: productId,
+                            action: "GameidbetPlay_ON",
                         });
                     } else if (roundId === results[0].roundId) {
-                        res.status(201).json({
-                            id: id,
-                            statusCode: 20002,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                        });
+                        if (productId === "918KISS") {
+                            let balanceNow = balanceUser - betPlay;
+                            res.status(201).json({
+                                username: usernameGame,
+                                currency: currency,
+                                timestampMillis: timestampMillis,
+                                balanceBefore: balanceUser,
+                                balanceAfter: balanceNow,
+                                id: id,
+                                statusCode: 0,
+                                productId: productId,
+                                action: "GamePlaceBets_ON",
+                            });
+                        } else {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 20002,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                action: "GameroundId_ON",
+                            });
+                        }
                     } else {
                         if (betPlay <= 0) {
                             let balanceNow = balanceUser + betPlay;
