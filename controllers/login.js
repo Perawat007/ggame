@@ -227,7 +227,7 @@ exports.SettlePlaySlotXo = async (req, res) => {
   const timestamp = req.body.timestamp;
   const roundid = req.body.roundid;
 
-  let spl = `SELECT credit, playgameuser, bet_latest, turnover FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, playgameuser, bet_latest, turnover, gameplayturn FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
