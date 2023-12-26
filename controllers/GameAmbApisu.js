@@ -603,7 +603,7 @@ http: exports.GameCancelBets = async (req, res) => {
                     }
                 } else if (results[0].actiongamenow === "settleBet" || results[0].actiongamenow === "settleBetWin") {
                     if (productId === "918KISS") {
-                        let splroundId = `SELECT balancebefore, balance_credit FROM repostgame WHERE roundId  ='${roundId}'`;
+                        let splroundId = `SELECT balancebefore, balance_credit, bet FROM repostgame WHERE roundId  ='${roundId}'`;
                         connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
                                 console.log(error);
@@ -621,7 +621,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                             productId: productId,
                                             currency: currency,
                                             balanceBefore: resultsroundId[0].balance_credit,
-                                            balanceAfter: resultsroundId[0].balancebefore,
+                                            balanceAfter: resultsroundId[0].balancebefore + resultsroundId[0].bet,
                                             username: usernameGame,
                                             action: 'Cbet>=0'
                                         });
