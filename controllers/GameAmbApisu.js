@@ -346,7 +346,7 @@ http: exports.GameSettleBets = async (req, res) => {
     const userAgentt = req.useragent;
     const roundId = txnsGame[0].roundId;
     const betAmount = txnsGame[0].payoutAmount;
-    const betPlay = txnsGame[0].betAmount;
+    //const betPlay = txnsGame[0].betAmount;
     let splTest = `SELECT credit, roundId FROM member 
     WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND roundId = '${roundId}' AND status = 'Y'`;
 
@@ -363,6 +363,7 @@ http: exports.GameSettleBets = async (req, res) => {
                         if (error) {
                             console.log(error);
                         } else {
+                            let betPlay = results[0].bet_latest;
                             if (results[0].actiongamenow === "cancelBet") {
                                 const sql_update = `UPDATE member set bet_latest='${0.01}' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
@@ -601,12 +602,16 @@ http: exports.GameCancelBets = async (req, res) => {
                 const balanceUser = parseFloat(results[0].credit);
                 const betPlay = txnsGame[0].betAmount;
                 if (results[0].bet_latest === 0 || results[0].bet_latest === 0.0) {
-                    res.status(201).json({
-                        id: id,
-                        statusCode: 20002,
-                        timestampMillis: timestampMillis,
-                        productId: productId,
-                    });
+                    if (results[0].actiongamenow !== "settleBet"){
+                        res.status(201).json({
+                            id: id,
+                            statusCode: 20002,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                        });
+                    } else {
+
+                    }
                 } else if (results[0].actiongamenow === "settleBet" || results[0].actiongamenow === "settleBetWin") {
                     res.status(201).json({
                         id: id,
@@ -635,7 +640,7 @@ http: exports.GameCancelBets = async (req, res) => {
                     });
                 } else {
                     if (betPlay < 0) {
-                        const balanceNow = balanceUser - results[0].bet_latest;
+                        const balanceNow = balanceUser + results[0].bet_latest;
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.0}', actiongamenow ='cancelBet'
                         WHERE phonenumber ='${usernameGame}'`;
                         connection.query(sql_update, (error, resultsGame) => {
