@@ -189,43 +189,29 @@ exports.PlaceBetSlotXo = async (req, res) => {
   const gamecode = req.body.gamecode;
   const userAgent = req.headers['user-agent'];
 
-  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, idplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
         const balanceNow = balanceUser - amount;
-        // if (results[0].roundId === roundid){
-        //   const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
-        //   winbonus ='N', roundId = '${roundid}' WHERE phonenumber ='${usernameGame}'`;
-        //   connection.query(sql_update, (error, resultsGame) => {
-        //     if (error) { console.log(error) }
-        //     else {
-        //       res.status(201).json({
-        //         Status: 0,
-        //         Message: "Success",
-        //         Username: usernameGame,
-        //         Balance: balanceUser
-        //       });
-        //     }
-        //   });
-        // } else {
-        //   const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
-        //   winbonus ='N', roundId = '${roundid}' WHERE phonenumber ='${usernameGame}'`;
-        //   connection.query(sql_update, (error, resultsGame) => {
-        //     if (error) { console.log(error) }
-        //     else {
-        //       res.status(201).json({
-        //         Status: 0,
-        //         Message: "Success",
-        //         Username: usernameGame,
-        //         Balance: balanceNow
-        //       });
-        //     }
-        //   });
-        // }
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+        if (results[0].idplaygame === id){
+          const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
+          winbonus ='N', roundId = '${roundid}' WHERE phonenumber ='${usernameGame}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                Status: 0,
+                Message: "Success",
+                Username: usernameGame,
+                Balance: balanceUser
+              });
+            }
+          });
+        } else {
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
           winbonus ='N', roundId = '${roundid}' WHERE phonenumber ='${usernameGame}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
@@ -238,6 +224,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
               });
             }
           });
+        }
       }
     })
   } catch (err) {
