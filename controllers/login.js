@@ -213,7 +213,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
               }
             });
           } else {
-            if (results[0].actiongamenow != 'CancelNotSave'){
+            if (results[0].actiongamenow !== 'CancelNotSave'){
               const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow ='placeBet', unsettleplay = 'N', 
               winbonus ='N', roundId = '${roundid}', idplaygame  = '${id}' WHERE phonenumber ='${usernameGame}'`;
                 connection.query(sql_update, (error, resultsGame) => {
