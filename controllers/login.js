@@ -241,7 +241,7 @@ exports.SettlePlaySlotXo = async (req, res) => {
         let balanceturnover = hasSimilarData(results[0].gameplayturn, "SLOTXO", results[0].turnover, amount)
         const post = {
           username: usernameGame, gameid: "SLOTXO", bet: betPlay, win: amount, balance_credit: balanceNow,
-          userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame
+          userAgent: userAgent, platform: userAgent, trans_id: roundid, namegame: namegame, roundId: roundid, balancebefore: balanceUser
         }
         let repost = repostGame.uploadLogRepostGame(post)
         const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE phonenumber ='${usernameGame}' `;
@@ -275,7 +275,7 @@ exports.CancelPlaySlotXo = async (req, res) => {
       else {
         const balanceUser = parseFloat(results[0].credit);
         const betPlay = parseFloat(results[0].bet_latest);
-        let balanceNow = balanceUser - betPlay;
+        let balanceNow = balanceUser + betPlay;
         const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
         connection.query(sql_update, (error, resultsGame) => {
           if (error) { console.log(error) }
