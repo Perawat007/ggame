@@ -656,6 +656,28 @@ http: exports.GameCancelBets = async (req, res) => {
                                     action: 'cancelBetActionV'
                                 });
                             }
+                        } else if (productId === "CQ9V2") {
+                            if (roundId === results[0].roundId) {
+                                res.status(201).json({
+                                    id: id,
+                                    statusCode: 20002,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    action: 'Cbet>==/*0CQ9V2'
+                                });
+                            } else {
+                                res.status(201).json({
+                                    id: id,
+                                    statusCode: 0,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    currency: currency,
+                                    balanceBefore: balanceUser,
+                                    balanceAfter: balanceUser,
+                                    username: usernameGame,
+                                    action: 'cancelBetActionVCQ9V2'
+                                });
+                            }
                         } else {
                             res.status(201).json({
                                 id: id,
