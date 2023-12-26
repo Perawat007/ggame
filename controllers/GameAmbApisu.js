@@ -536,10 +536,6 @@ http: exports.GameSettleBets = async (req, res) => {
                                         statusCode: 10002,
                                         timestampMillis: timestampMillis,
                                         productId: productId,
-                                        // currency: currency,
-                                        // balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                                        // balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                                        // username: usernameGame
                                     });
                                 }
                             }
@@ -548,12 +544,14 @@ http: exports.GameSettleBets = async (req, res) => {
                 } else {
                     console.log(resultsstart[0].roundId, roundId);
                     const balanceUser = parseFloat(resultsstart[0].credit);
-                    if (productId === "CQ9V2" || productId === "ACE333" ) {
+                    if (productId === "CQ9V2" || productId === "ACE333"|| productId === "918KISS") {
                         res.status(201).json({
+                            tpyetest: "round = 2",
                             id: id,
                             statusCode: 20002,
                             timestampMillis: timestampMillis,
                             productId: productId,
+                            balanceAfter: convertToTwoDecimalPlaces(balanceUser),
                         });
                     } else {
                         res.status(201).json({
