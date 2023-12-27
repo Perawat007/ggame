@@ -839,7 +839,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                     } else {
                                         const balanceUser = parseFloat(resultRound[0].credit);
                                         let amount = 0
-                                        for (let i = 0; i < txnsGame.length; i++){
+                                        for (let i = 0; i < txnsGame.length; i++) {
                                             amount += txnsGame[i].payoutAmount
                                         }
                                         let balanceNow = balanceUser + amount;
@@ -1720,14 +1720,19 @@ http: exports.GameVoidBets = async (req, res) => {
             if (error) {
                 console.log(error);
             } else {
-                if (results[0].actiongamenow === 'cancelBet'){
-
+                if (results[0].actiongamenow === 'cancelBetVoid') {
+                    res.status(201).json({
+                        id: id,
+                        statusCode: 20002,
+                        timestampMillis: timestampMillis,
+                        productId: productId,
+                    });
                 } else {
                     const balanceUser = parseFloat(results[0].credit);
                     const betPlay = txnsGame[0].betAmount;
                     const betpayoutAmount = txnsGame[0].payoutAmount;
-                    const balanceNow = balanceUser - (betpayoutAmount - betPlay) ;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', actiongamenow = 'cancelBet'
+                    const balanceNow = balanceUser - (betpayoutAmount - betPlay);
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', actiongamenow = 'cancelBetVoid'
                     WHERE phonenumber ='${usernameGame}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         if (error) {
@@ -1747,7 +1752,7 @@ http: exports.GameVoidBets = async (req, res) => {
                         }
                     });
                 }
-                
+
             }
         });
     } catch (err) {
