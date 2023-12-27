@@ -766,7 +766,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                             roundId: roundId, balancebefore: balanceUser
                                                         };
                                                         let repost = repostGame.uploadLogRepostGame(post);
-                                                        const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',
+                                                        const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', 
                                                             roundId = '${roundId}', idplaygame  = '${idbetPlay}', actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
 
                                                         connection.query(sql_update, (error, resultsGame) => {
@@ -1714,35 +1714,40 @@ http: exports.GameVoidBets = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
-    username = "member001";
-    let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) {
                 console.log(error);
             } else {
-                const balanceUser = parseFloat(results[0].credit);
-                const betPlay = txnsGame[0].betAmount;
-                const betpayoutAmount = txnsGame[0].payoutAmount;
-                const balanceNow = balanceUser - (betpayoutAmount - betPlay) ;
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}' WHERE phonenumber ='${usernameGame}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        res.status(201).json({
-                            id: id,
-                            statusCode: 0,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                            currency: currency,
-                            balanceBefore: balanceUser,
-                            balanceAfter: balanceNow,
-                            username: usernameGame,
-                            action: 'GameVoidBets'
-                        });
-                    }
-                });
+                if (results[0].actiongamenow === 'cancelBet'){
+
+                } else {
+                    const balanceUser = parseFloat(results[0].credit);
+                    const betPlay = txnsGame[0].betAmount;
+                    const betpayoutAmount = txnsGame[0].payoutAmount;
+                    const balanceNow = balanceUser - (betpayoutAmount - betPlay) ;
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', actiongamenow = '${cancelBet}'
+                    WHERE phonenumber ='${usernameGame}'`;
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 0,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                                currency: currency,
+                                balanceBefore: balanceUser,
+                                balanceAfter: balanceNow,
+                                username: usernameGame,
+                                action: 'GameVoidBets'
+                            });
+                        }
+                    });
+                }
+                
             }
         });
     } catch (err) {
