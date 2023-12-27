@@ -434,6 +434,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                         balanceAfter: convertToTwoDecimalPlaces(balanceUser),
                                                         username: usernameGame,
+                                                        action: 'Settle>==4'
                                                     });
                                                 } else {
                                                     if (results[0].idplaygame === idbetPlay) {
@@ -462,6 +463,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                         balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                         username: usernameGame,
+                                                                        action: 'Settle>==3'
                                                                     });
                                                                 }
                                                             });
@@ -490,6 +492,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                         balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                         username: usernameGame,
+                                                                        action: 'Settle>==2'
                                                                     });
                                                                 }
                                                             });
@@ -523,6 +526,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                     balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                     balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                     username: usernameGame,
+                                                                    action: 'Settle>==1'
                                                                 });
                                                             }
                                                         });
@@ -555,6 +559,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                 balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                 balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                 username: usernameGame,
+                                                                action: 'Settle>==0'
                                                             });
                                                         }
                                                     });
@@ -688,6 +693,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                         balanceAfter: convertToTwoDecimalPlaces(balanceUser),
                                                         username: usernameGame,
+                                                        action: 'Settle>==4'
                                                     });
                                                 } else {
                                                     if (results[0].idplaygame === idbetPlay) {
@@ -716,6 +722,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                         balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                         username: usernameGame,
+                                                                        action: 'Settle>==3'
                                                                     });
                                                                 }
                                                             });
@@ -743,6 +750,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                         balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                         username: usernameGame,
+                                                                        action: 'Settle>==2'
                                                                     });
                                                                 }
                                                             });
@@ -774,6 +782,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                     balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                     balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                     username: usernameGame,
+                                                                    action: 'Settle>==1'
                                                                 });
                                                             }
                                                         });
@@ -805,6 +814,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                 balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                 balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                 username: usernameGame,
+                                                                action: 'Settle>==0'
                                                             });
                                                         }
                                                     });
@@ -965,6 +975,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                             balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                             balanceAfter: convertToTwoDecimalPlaces(balanceUser),
                                                             username: usernameGame,
+                                                            action: 'Settle>==4'
                                                         });
                                                     } else {
                                                         if (results[0].idplaygame === idbetPlay) {
@@ -993,6 +1004,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                             balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                             balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                             username: usernameGame,
+                                                                            action: 'Settle>==3'
                                                                         });
                                                                     }
                                                                 });
@@ -1021,6 +1033,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                             balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                             balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                             username: usernameGame,
+                                                                            action: 'Settle>==2'
                                                                         });
                                                                     }
                                                                 });
@@ -1054,6 +1067,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                         balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                         balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                         username: usernameGame,
+                                                                        action: 'Settle>==1'
                                                                     });
                                                                 }
                                                             });
@@ -1086,6 +1100,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                                                     balanceBefore: convertToTwoDecimalPlaces(balanceUser),
                                                                     balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                                                     username: usernameGame,
+                                                                    action: 'Settle>==0'
                                                                 });
                                                             }
                                                         });
