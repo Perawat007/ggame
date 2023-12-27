@@ -572,29 +572,35 @@ exports.WithdrawSlotXo = async (req, res) => {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        if (results[0].idplaygame === id) {
-          const balanceUser = parseFloat(results[0].credit);
-          res.status(201).json({
-            Status: 0,
-            Message: "Success",
-            Username: usernameGame,
-            Balance: balanceUser
-          });
+        const balanceUser = parseFloat(results[0].credit);
+        if (amount < balanceUser) {
+          if (results[0].idplaygame === id) {
+            res.status(201).json({
+              Status: 0,
+              Message: "Success",
+              Username: usernameGame,
+              Balance: balanceUser
+            });
+          } else {
+            const balanceNow = balanceUser - amount;
+            const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${id}' 
+            WHERE phonenumber ='${usernameGame}'`;
+            connection.query(sql_update, (error, resultsGame) => {
+              if (error) { console.log(error) }
+              else {
+                res.status(201).json({
+                  Status: 0,
+                  Message: "Success",
+                  Username: usernameGame,
+                  Balance: balanceNow
+                });
+              }
+            });
+          }
         } else {
-          const balanceUser = parseFloat(results[0].credit);
-          const balanceNow = balanceUser - amount;
-          const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${id}' 
-          WHERE phonenumber ='${usernameGame}'`;
-          connection.query(sql_update, (error, resultsGame) => {
-            if (error) { console.log(error) }
-            else {
-              res.status(201).json({
-                Status: 0,
-                Message: "Success",
-                Username: usernameGame,
-                Balance: balanceNow
-              });
-            }
+          res.status(201).json({
+            Error: "100",
+            Description: "Insufficient fund"
           });
         }
       }
