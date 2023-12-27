@@ -1670,7 +1670,6 @@ http: exports.GameTipsCancel = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
-    username = "member001";
     let spl = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -1679,6 +1678,7 @@ http: exports.GameTipsCancel = async (req, res) => {
             } else {
                 const balanceUser = parseFloat(results[0].credit);
                 const betPlay = txnsGame[0].betAmount;
+                const payoutAmount = txnsGame[0].payoutAmount;
                 const balanceNow = balanceUser + betPlay;
                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}' WHERE phonenumber ='${usernameGame}'`;
                 connection.query(sql_update, (error, resultsGame) => {
@@ -1694,6 +1694,7 @@ http: exports.GameTipsCancel = async (req, res) => {
                             balanceBefore: balanceUser,
                             balanceAfter: balanceNow,
                             username: usernameGame,
+                            action: 'GameTipsCancel'
                         });
                     }
                 });
@@ -1723,7 +1724,7 @@ http: exports.GameVoidBets = async (req, res) => {
                 const balanceUser = parseFloat(results[0].credit);
                 const betPlay = txnsGame[0].betAmount;
                 const betpayoutAmount = txnsGame[0].payoutAmount;
-                const balanceNow = balanceUser + betpayoutAmount;
+                const balanceNow = (balanceUser - betPlay) + betpayoutAmount;
                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}' WHERE phonenumber ='${usernameGame}'`;
                 connection.query(sql_update, (error, resultsGame) => {
                     if (error) {
@@ -1738,6 +1739,7 @@ http: exports.GameVoidBets = async (req, res) => {
                             balanceBefore: balanceUser,
                             balanceAfter: balanceNow,
                             username: usernameGame,
+                            action: 'GameVoidBets'
                         });
                     }
                 });
