@@ -828,7 +828,11 @@ http: exports.GameSettleBets = async (req, res) => {
                                         console.log(error);
                                     } else {
                                         const balanceUser = parseFloat(resultRound[0].credit);
-                                        let balanceNow = balanceUser + betAmount;
+                                        let amount = 0
+                                        for (let i = 0; i < txnsGame.length; i++){
+                                            amount += txnsGame[i].payoutAmount
+                                        }
+                                        let balanceNow = balanceUser + amount;
                                         if (productId === 'I8') {
                                             if (resultRound[0].idplaygame === idbetPlay) {
                                                 res.status(201).json({
