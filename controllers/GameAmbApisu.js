@@ -1721,37 +1721,28 @@ http: exports.GameVoidBets = async (req, res) => {
             if (error) {
                 console.log(error);
             } else {
-                if (results[0].bet_latest < 0){
-                    const balanceUser = parseFloat(results[0].credit);
-                    const betPlay = txnsGame[0].betAmount;
-                    const betpayoutAmount = txnsGame[0].payoutAmount;
-                    const balanceNow = balanceUser - (betpayoutAmount - betPlay) ;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}' WHERE phonenumber ='${usernameGame}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            res.status(201).json({
-                                id: id,
-                                statusCode: 0,
-                                timestampMillis: timestampMillis,
-                                productId: productId,
-                                currency: currency,
-                                balanceBefore: balanceUser,
-                                balanceAfter: balanceNow,
-                                username: usernameGame,
-                                action: 'GameVoidBets'
-                            });
-                        }
-                    });
-                } else {
-                    res.status(201).json({
-                        id: id,
-                        statusCode: 20002,
-                        timestampMillis: timestampMillis,
-                        productId: productId,
-                    });
-                }
+                const balanceUser = parseFloat(results[0].credit);
+                const betPlay = txnsGame[0].betAmount;
+                const betpayoutAmount = txnsGame[0].payoutAmount;
+                const balanceNow = balanceUser - (betpayoutAmount - betPlay) ;
+                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}' WHERE phonenumber ='${usernameGame}'`;
+                connection.query(sql_update, (error, resultsGame) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        res.status(201).json({
+                            id: id,
+                            statusCode: 0,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                            currency: currency,
+                            balanceBefore: balanceUser,
+                            balanceAfter: balanceNow,
+                            username: usernameGame,
+                            action: 'GameVoidBets'
+                        });
+                    }
+                });
             }
         });
     } catch (err) {
