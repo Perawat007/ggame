@@ -562,17 +562,32 @@ http: exports.GameSettleBets = async (req, res) => {
                                         console.log(error);
                                     } else {
                                         const balanceUser = parseFloat(resultRound[0].credit);
-                                        res.status(201).json({
-                                            tpyetest: "round = 4",
-                                            id: id,
-                                            statusCode: 0,
-                                            timestampMillis: timestampMillis,
-                                            productId: productId,
-                                            currency: currency,
-                                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                                            balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                                            username: usernameGame,
-                                        });
+                                        let balanceNow = balanceUser + betAmount;
+                                        if (productId === 'SPINIX'){
+                                            res.status(201).json({
+                                                tpyetest: "round = 5",
+                                                id: id,
+                                                statusCode: 0,
+                                                timestampMillis: timestampMillis,
+                                                productId: productId,
+                                                currency: currency,
+                                                balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                                balanceAfter: convertToTwoDecimalPlaces(balanceNow),
+                                                username: usernameGame,
+                                            });
+                                        } else {
+                                            res.status(201).json({
+                                                tpyetest: "round = 4",
+                                                id: id,
+                                                statusCode: 0,
+                                                timestampMillis: timestampMillis,
+                                                productId: productId,
+                                                currency: currency,
+                                                balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                                balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                                username: usernameGame,
+                                            });
+                                        }
                                     }
                                 })
                             }
