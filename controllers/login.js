@@ -51,7 +51,9 @@ function convertToTwoDecimalPlaces(number) {
   }
   return number; // คืนค่าเดิมถ้าไม่เข้าเงื่อนไข
 }
-
+function truncateToSingleDecimalPlace(number) {
+  return Math.floor(number * 10) / 10;
+}
 http://localhost:5000/post/checkBalance 
 exports.checkBalance = async (req, res) => {
   const id = req.body.id;
@@ -250,7 +252,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
                     Status: 0,
                     Message: "Success",
                     Username: usernameGame,
-                    Balance: convertToTwoDecimalPlaces(balanceNow),
+                    Balance: truncateToSingleDecimalPlace(balanceNow),
                     action: 'idNOalready',
                     actiongamenow: results[0].actiongamenow
                   });
