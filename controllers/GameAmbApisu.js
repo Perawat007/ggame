@@ -1721,7 +1721,7 @@ http: exports.GameVoidBets = async (req, res) => {
             if (error) {
                 console.log(error);
             } else {
-                if (results[0].bet_latest > 0){
+                if (results[0].bet_latest < 0){
                     const balanceUser = parseFloat(results[0].credit);
                     const betPlay = txnsGame[0].betAmount;
                     const betpayoutAmount = txnsGame[0].payoutAmount;
