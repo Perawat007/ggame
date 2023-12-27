@@ -1714,19 +1714,35 @@ http: exports.GameVoidBets = async (req, res) => {
     const currency = req.body.currency;
     const usernameGame = req.body.username;
     const txnsGame = req.body.txns;
-    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+    const roundId = txnsGame[0].roundId;
+    let spl = `SELECT credit, bet_latest, actiongamenow, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) {
                 console.log(error);
             } else {
                 if (results[0].actiongamenow === 'cancelBetVoid') {
-                    res.status(201).json({
-                        id: id,
-                        statusCode: 20002,
-                        timestampMillis: timestampMillis,
-                        productId: productId,
-                    });
+                    if (results[0].roundId === roundId){
+                        res.status(201).json({
+                            id: id,
+                            statusCode: 20002,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                        });
+                    } else {
+                        const balanceUser = parseFloat(results[0].credit);
+                        res.status(201).json({
+                            id: id,
+                            statusCode: 0,
+                            timestampMillis: timestampMillis,
+                            productId: productId,
+                            currency: currency,
+                            balanceBefore: balanceUser,
+                            balanceAfter: balanceUser,
+                            username: usernameGame,
+                            action: 'GameVoidBetsIdrood'
+                        });
+                    }
                 } else {
                     const balanceUser = parseFloat(results[0].credit);
                     const betPlay = txnsGame[0].betAmount;
