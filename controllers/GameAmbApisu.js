@@ -559,10 +559,13 @@ http: exports.GameSettleBets = async (req, res) => {
                                 res.status(201).json({
                                     tpyetest: "round = 4",
                                     id: id,
-                                    statusCode: 20002,
+                                    statusCode: 0,
                                     timestampMillis: timestampMillis,
                                     productId: productId,
-                                    balanceAfter: convertToTwoDecimalPlaces(resultsstart[0].credit),
+                                    currency: currency,
+                                    balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                    balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                    username: usernameGame,
                                 });
                             }
                         }
