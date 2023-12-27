@@ -1038,13 +1038,14 @@ http: exports.GameCancelBets = async (req, res) => {
                                     });
                                 }
                             });
+                        } else {
+                            res.status(201).json({
+                                id: id,
+                                statusCode: 20004,
+                                timestampMillis: timestampMillis,
+                                productId: productId,
+                            });
                         }
-                        res.status(201).json({
-                            id: id,
-                            statusCode: 20004,
-                            timestampMillis: timestampMillis,
-                            productId: productId,
-                        });
                     }
                 } else if (results[0].actiongamenow === "cancelBet") {
                     const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
