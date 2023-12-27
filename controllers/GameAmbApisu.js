@@ -1019,6 +1019,26 @@ http: exports.GameCancelBets = async (req, res) => {
                             }
                         })
                     } else {
+                        if (productId === "SPINIX") {
+                            const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
+                            connection.query(sql_updateaction, (error, resultsGame) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    res.status(201).json({
+                                        id: id,
+                                        statusCode: 0,
+                                        timestampMillis: timestampMillis,
+                                        productId: productId,
+                                        currency: currency,
+                                        balanceBefore: balanceUser,
+                                        balanceAfter: balanceUser,
+                                        username: usernameGame,
+                                        action: 'cancelBetNoAction'
+                                    });
+                                }
+                            });
+                        }
                         res.status(201).json({
                             id: id,
                             statusCode: 20004,
