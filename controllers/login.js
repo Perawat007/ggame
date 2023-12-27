@@ -959,11 +959,12 @@ exports.PlayerBetJili = async (req, res) => {
             const namegame = results[0].playgameuser;
             const post = {
               username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
-              userAgent: userAgent, platform: userAgent, namegame: namegame
+              userAgent: userAgent, platform: userAgent, namegame: namegame,  roundId: round, balancebefore: balanceUser, 
+              trans_id:reqId
             }
             let repost = repostGame.uploadLogRepostGame(post)
 
-            let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, betAmount)
+            let balanceturnover = hasSimilarData(results[0].gameplayturn, "JILI", results[0].turnover, betAmount)
 
             const sql_update = `UPDATE member set credit='${balanceNowwit}',bet_latest='${betAmount}', turnover='${balanceturnover}',
             roundId = '${round}' WHERE phonenumber ='${results[0].username}'`;
