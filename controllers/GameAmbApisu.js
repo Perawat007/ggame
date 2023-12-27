@@ -556,17 +556,25 @@ http: exports.GameSettleBets = async (req, res) => {
                                     }
                                 });
                             } else {
-                                res.status(201).json({
-                                    tpyetest: "round = 4",
-                                    id: id,
-                                    statusCode: 0,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
-                                    currency: currency,
-                                    balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                                    balanceAfter: convertToTwoDecimalPlaces(balanceUser),
-                                    username: usernameGame,
-                                });
+                                let splTestRound = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
+                                connection.query(splTestRound, (error, resultRound) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        const balanceUser = parseFloat(resultRound[0].credit);
+                                        res.status(201).json({
+                                            tpyetest: "round = 4",
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                            balanceAfter: convertToTwoDecimalPlaces(balanceUser),
+                                            username: usernameGame,
+                                        });
+                                    }
+                                })
                             }
                         }
                     });
