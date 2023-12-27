@@ -393,13 +393,22 @@ http: exports.GameSettleBets = async (req, res) => {
                                                     console.log(error);
                                                 } else {
                                                     if (productId === 'SPINIX') {
-                                                        res.status(201).json({
-                                                            id: id,
-                                                            statusCode: 20001,
-                                                            productId: productId,
-                                                            timestampMillis: timestampMillis,
-                                                        });
-                                                    }else{
+                                                        if (results[0].actiongamenow === "cancelBet") {
+                                                            res.status(201).json({
+                                                                id: id,
+                                                                statusCode: 20003,
+                                                                productId: productId,
+                                                                timestampMillis: timestampMillis,
+                                                            });
+                                                        } else {
+                                                            res.status(201).json({
+                                                                id: id,
+                                                                statusCode: 20001,
+                                                                productId: productId,
+                                                                timestampMillis: timestampMillis,
+                                                            });
+                                                        }
+                                                    } else {
                                                         res.status(201).json({
                                                             id: id,
                                                             statusCode: 20003,
@@ -933,13 +942,20 @@ http: exports.GameCancelBets = async (req, res) => {
                             }
                         } else if (productId === "REDTIGER" || productId === "SPINIX") {
                             if (roundId === results[0].roundId) {
-                                res.status(201).json({
-                                    id: id,
-                                    statusCode: 20002,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
-                                    action: 'Cbet>==/*REDTIGER'
-                                });
+                                const sql_updateaction = `UPDATE member set actiongamenow ='cancelFail' WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_updateaction, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 20002,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            action: 'Cbet>==/*REDTIGER'
+                                        });
+                                    }
+                                })
                             } else {
                                 const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_updateaction, (error, resultsGame) => {
