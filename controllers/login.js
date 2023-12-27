@@ -567,12 +567,12 @@ exports.WithdrawSlotXo = async (req, res) => {
   const gamecode = req.body.gamecode;
   const userAgent = req.headers['user-agent'];
 
-  let spl = `SELECT credit, winbonus, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, winbonus, idplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        if (results[0].roundId === roundid) {
+        if (results[0].idplaygame === id) {
           const balanceUser = parseFloat(results[0].credit);
           res.status(201).json({
             Status: 0,
@@ -583,7 +583,7 @@ exports.WithdrawSlotXo = async (req, res) => {
         } else {
           const balanceUser = parseFloat(results[0].credit);
           const balanceNow = balanceUser - amount;
-          const sql_update = `UPDATE member set credit='${balanceNow}', roundId = '${roundid}' 
+          const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${id}' 
           WHERE phonenumber ='${usernameGame}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
