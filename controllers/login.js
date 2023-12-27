@@ -189,7 +189,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
   const gamecode = req.body.gamecode;
   const userAgent = req.headers['user-agent'];
 
-  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, idplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, idplaygame, actiongamenow FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
