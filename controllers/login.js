@@ -41,6 +41,17 @@ function hasSimilarData(gameplayturn, input, turnover, betPlay) {
   }
 }
 
+function convertToTwoDecimalPlaces(number) {
+  if (!isNaN(number) && Number(number) % 1 !== 0) {
+      const strNumber = number.toString();
+      const decimalPlaces = strNumber.split(".")[1].length;
+      if (decimalPlaces > 2) {
+          return Math.round(number); // แปลงเป็นจำนวนเต็ม
+      }
+  }
+  return number; // คืนค่าเดิมถ้าไม่เข้าเงื่อนไข
+}
+
 http://localhost:5000/post/checkBalance 
 exports.checkBalance = async (req, res) => {
   const id = req.body.id;
@@ -239,7 +250,7 @@ exports.PlaceBetSlotXo = async (req, res) => {
                     Status: 0,
                     Message: "Success",
                     Username: usernameGame,
-                    Balance: balanceNow,
+                    Balance: convertToTwoDecimalPlaces(balanceNow),
                     action: 'idNOalready',
                     actiongamenow: results[0].actiongamenow
                   });
