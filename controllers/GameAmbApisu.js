@@ -924,7 +924,7 @@ http: exports.GameCancelBets = async (req, res) => {
                                     }
                                 })
                             }
-                        } else if (productId === "REDTIGER") {
+                        } else if (productId === "REDTIGER" || productId === "SPINIX") {
                             if (roundId === results[0].roundId) {
                                 res.status(201).json({
                                     id: id,
