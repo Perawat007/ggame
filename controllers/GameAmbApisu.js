@@ -1727,7 +1727,7 @@ http: exports.GameVoidBets = async (req, res) => {
                     const betPlay = txnsGame[0].betAmount;
                     const betpayoutAmount = txnsGame[0].payoutAmount;
                     const balanceNow = balanceUser - (betpayoutAmount - betPlay) ;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', actiongamenow = '${cancelBet}'
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${betPlay}', actiongamenow = 'cancelBet'
                     WHERE phonenumber ='${usernameGame}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         if (error) {
