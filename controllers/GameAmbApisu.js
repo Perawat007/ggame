@@ -386,7 +386,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                     if (error) {
                                         console.log(error);
                                     } else {
-                                        if (results[0].actiongamenow === "cancelBet") {
+                                        if (results[0].actiongamenow === "cancelBet" || results[0].actiongamenow === "cancelFail") {
                                             const sql_update = `UPDATE member set bet_latest='${0.01}' WHERE phonenumber ='${usernameGame}'`;
                                             connection.query(sql_update, (error, resultsGame) => {
                                                 if (error) {
