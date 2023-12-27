@@ -374,7 +374,7 @@ http: exports.GameSettleBets = async (req, res) => {
             if (error) {
                 console.log(error);
             } else {
-                if (productId === 'PGSOFT2') {
+                if (productId === 'PGSOFT2' || productId === 'SPINIX') {
                     let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundId}'`;
                     connection.query(splroundId, (error, resultsroundId) => {
                         if (error) {
