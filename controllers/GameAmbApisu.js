@@ -352,8 +352,6 @@ http: exports.GamePlaceBets = async (req, res) => {
         res.json({ status: "Not Data Request Body." });
     }
 };
-
-
 //localhost:5000/post/game/settleBets
 http: exports.GameSettleBets = async (req, res) => {
     const id = req.body.id;
@@ -394,12 +392,21 @@ http: exports.GameSettleBets = async (req, res) => {
                                                 if (error) {
                                                     console.log(error);
                                                 } else {
-                                                    res.status(201).json({
-                                                        id: id,
-                                                        statusCode: 20003,
-                                                        timestampMillis: timestampMillis,
-                                                        productId: productId,
-                                                    });
+                                                    if (productId === 'SPINIX') {
+                                                        res.status(201).json({
+                                                            id: id,
+                                                            statusCode: 20001,
+                                                            productId: productId,
+                                                            timestampMillis: timestampMillis,
+                                                        });
+                                                    }else{
+                                                        res.status(201).json({
+                                                            id: id,
+                                                            statusCode: 20003,
+                                                            timestampMillis: timestampMillis,
+                                                            productId: productId,
+                                                        });
+                                                    }
                                                 }
                                             });
                                         } else {
