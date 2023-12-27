@@ -594,7 +594,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                         timestampMillis: timestampMillis,
                                         productId: productId,
                                     });
-                                } else if (productId === "918KISS") {
+                                } else if (productId === "918KISS" || productId === 'REDTIGER') {
                                     res.status(201).json({
                                         tpyetest: "round = 3",
                                         id: id,
@@ -887,6 +887,35 @@ http: exports.GameCancelBets = async (req, res) => {
                                             balanceAfter: balanceUser,
                                             username: usernameGame,
                                             action: 'cancelBetActionVCQ9V2'
+                                        });
+                                    }
+                                })
+                            }
+                        } else if (productId === "REDTIGER") {
+                            if (roundId === results[0].roundId) {
+                                res.status(201).json({
+                                    id: id,
+                                    statusCode: 20002,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                    action: 'Cbet>==/*REDTIGER'
+                                });
+                            } else {
+                                const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
+                                connection.query(sql_updateaction, (error, resultsGame) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        res.status(201).json({
+                                            id: id,
+                                            statusCode: 0,
+                                            timestampMillis: timestampMillis,
+                                            productId: productId,
+                                            currency: currency,
+                                            balanceBefore: balanceUser,
+                                            balanceAfter: balanceUser,
+                                            username: usernameGame,
+                                            action: 'cancelBetActionREDTIGER'
                                         });
                                     }
                                 })
