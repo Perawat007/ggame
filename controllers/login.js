@@ -399,26 +399,35 @@ http://localhost:5000/post/bonus-win
 exports.bonusPlaySlotXo = async (req, res) => {
   const amount = req.body.amount;
   const usernameGame = req.body.username;
-
-  let spl = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+  let spl = `SELECT credit, winbonus FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const balanceUser = parseFloat(results[0].credit);
-        const balanceNow = balanceUser + amount;
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${usernameGame}'`;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              Status: 0,
-              Message: "Success",
-              Username: usernameGame,
-              Balance: balanceNow
-            });
-          }
-        });
+        if (results[0].winbonus === 'N') {
+          const balanceUser = parseFloat(results[0].credit);
+          const balanceNow = balanceUser + amount;
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', winbonus = 'Y' WHERE phonenumber ='${usernameGame}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                Status: 0,
+                Message: "Success",
+                Username: usernameGame,
+                Balance: balanceNow
+              });
+            }
+          });
+        } else {
+          const balanceUser = parseFloat(results[0].credit);
+          res.status(201).json({
+            Status: 0,
+            Message: "Success",
+            Username: usernameGame,
+            Balance: balanceUser
+          });
+        }
       }
     })
   } catch (err) {
