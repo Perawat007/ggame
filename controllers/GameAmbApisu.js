@@ -564,7 +564,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                         const balanceUser = parseFloat(resultRound[0].credit);
                                         let balanceNow = balanceUser + betAmount;
                                         if (productId === 'SPINIX') {
-                                            if (results[0].idplaygame === idbetPlay) {
+                                            if (resultRound[0].idplaygame === idbetPlay) {
                                                 res.status(201).json({
                                                     tpyetest: "round = 4.2",
                                                     id: id,
