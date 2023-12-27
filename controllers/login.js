@@ -409,7 +409,8 @@ exports.bonusPlaySlotXo = async (req, res) => {
           if (results[0].winbonus === 'N') {
             const balanceUser = parseFloat(results[0].credit);
             const balanceNow = balanceUser + amount;
-            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', winbonus = 'Y' WHERE phonenumber ='${usernameGame}'`;
+            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', winbonus = 'Y', roundId = '${roundid}' 
+            WHERE phonenumber ='${usernameGame}'`;
             connection.query(sql_update, (error, resultsGame) => {
               if (error) { console.log(error) }
               else {
@@ -433,7 +434,8 @@ exports.bonusPlaySlotXo = async (req, res) => {
         } else {
           const balanceUser = parseFloat(results[0].credit);
           const balanceNow = balanceUser + amount;
-          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', winbonus = 'Y' WHERE phonenumber ='${usernameGame}'`;
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', winbonus = 'Y', roundId = '${roundid}' 
+          WHERE phonenumber ='${usernameGame}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
             else {
