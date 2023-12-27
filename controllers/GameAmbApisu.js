@@ -1021,6 +1021,13 @@ http: exports.GameCancelBets = async (req, res) => {
                     } else {
                         if (productId === "SPINIX") {
                             if (results[0].roundId === roundId) {
+                                res.status(201).json({
+                                    id: id,
+                                    statusCode: 20004,
+                                    timestampMillis: timestampMillis,
+                                    productId: productId,
+                                });
+                            } else {
                                 const sql_updateaction = `UPDATE member set actiongamenow ='cancelBetNoupdate' WHERE phonenumber ='${usernameGame}'`;
                                 connection.query(sql_updateaction, (error, resultsGame) => {
                                     if (error) {
@@ -1038,13 +1045,6 @@ http: exports.GameCancelBets = async (req, res) => {
                                             action: 'cancelBetNoAction'
                                         });
                                     }
-                                });
-                            } else {
-                                res.status(201).json({
-                                    id: id,
-                                    statusCode: 20004,
-                                    timestampMillis: timestampMillis,
-                                    productId: productId,
                                 });
                             }
                         } else {
