@@ -367,6 +367,7 @@ http: exports.GameSettleBets = async (req, res) => {
     const roundId = txnsGame[0].roundId;
     const betAmount = txnsGame[0].payoutAmount;
     const betPlay = txnsGame[0].betAmount;
+    const idbetPlay = txnsGame[0].id;
     let splTest = `SELECT credit, roundId FROM member 
         WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND roundId = '${roundId}' AND status = 'Y'`;
     try {
@@ -404,7 +405,6 @@ http: exports.GameSettleBets = async (req, res) => {
                                         } else {
                                             const namegame = results[0].playgameuser;
                                             const balanceUser = parseFloat(results[0].credit);
-                                            const idbetPlay = txnsGame[0].id;
                                             let status = 0;
                                             console.log(balanceUser, betAmount, betPlay, "GameSettleBets");
                                             if (balanceUser >= 0 && balanceUser >= betPlay) {
@@ -556,7 +556,7 @@ http: exports.GameSettleBets = async (req, res) => {
                                     }
                                 });
                             } else {
-                                let splTestRound = `SELECT credit FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
+                                let splTestRound = `SELECT credit, idplaygame FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N' AND status = 'Y'`;
                                 connection.query(splTestRound, (error, resultRound) => {
                                     if (error) {
                                         console.log(error);
@@ -564,25 +564,35 @@ http: exports.GameSettleBets = async (req, res) => {
                                         const balanceUser = parseFloat(resultRound[0].credit);
                                         let balanceNow = balanceUser + betAmount;
                                         if (productId === 'SPINIX') {
-                                            const sql_update = `UPDATE member set credit='${balanceNow}',roundId = '${roundId}',
-                                            actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
-                                            connection.query(sql_update, (error, resultsGame) => {
-                                                if (error) {
-                                                    console.log(error);
-                                                } else {
-                                                    res.status(201).json({
-                                                        tpyetest: "round = 5",
-                                                        id: id,
-                                                        statusCode: 0,
-                                                        timestampMillis: timestampMillis,
-                                                        productId: productId,
-                                                        currency: currency,
-                                                        balanceBefore: convertToTwoDecimalPlaces(balanceUser),
-                                                        balanceAfter: convertToTwoDecimalPlaces(balanceNow),
-                                                        username: usernameGame,
-                                                    });
-                                                }
-                                            })
+                                            if (results[0].idplaygame === idbetPlay) {
+                                                res.status(201).json({
+                                                    tpyetest: "round = 4.2",
+                                                    id: id,
+                                                    statusCode: 20002,
+                                                    timestampMillis: timestampMillis,
+                                                    productId: productId,
+                                                });
+                                            } else {
+                                                const sql_update = `UPDATE member set credit='${balanceNow}',roundId = '${roundId}',
+                                                actiongamenow ='settleBet' WHERE phonenumber ='${usernameGame}'`;
+                                                connection.query(sql_update, (error, resultsGame) => {
+                                                    if (error) {
+                                                        console.log(error);
+                                                    } else {
+                                                        res.status(201).json({
+                                                            tpyetest: "round = 5",
+                                                            id: id,
+                                                            statusCode: 0,
+                                                            timestampMillis: timestampMillis,
+                                                            productId: productId,
+                                                            currency: currency,
+                                                            balanceBefore: convertToTwoDecimalPlaces(balanceUser),
+                                                            balanceAfter: convertToTwoDecimalPlaces(balanceNow),
+                                                            username: usernameGame,
+                                                        });
+                                                    }
+                                                })
+                                            }
                                         } else {
                                             res.status(201).json({
                                                 tpyetest: "round = 4",
