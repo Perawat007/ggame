@@ -547,6 +547,7 @@ http://localhost:5000/post/gaming/rollback
 exports.RollbackGaming = async (req, res) => {
     const amount = req.body.amount;
     const username = req.body.playerId;
+    const txnId = req.body.txnId;
     let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -561,7 +562,7 @@ exports.RollbackGaming = async (req, res) => {
                         if (error) { console.log(error) }
                         else {
                             res.status(201).json({
-                                extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                                extTxnId: txnId,
                                 currency: "THB",
                                 balance: balanceNow
                             });
@@ -570,7 +571,7 @@ exports.RollbackGaming = async (req, res) => {
                 } else {
                     const balanceUser = parseFloat(results[0].credit);
                     res.status(201).json({
-                        extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                        extTxnId: txnId,
                         currency: "THB",
                         balance: balanceUser
                     });
