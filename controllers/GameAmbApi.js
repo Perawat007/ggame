@@ -451,6 +451,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
     const txnEventType = req.body.txnEventType
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
+    let numberCancek = '1';
     let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest, roundId, actiongamenow FROM member 
     WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
@@ -473,8 +474,21 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                 });
                             } else {
                                 balanceNow = balanceUser - balanceamount;
+                                if (results[0].actiongamenow === '2'){
+                                    numberCancek = '1.1';
+                                } else if (results[0].actiongamenow === '3'){
+                                    numberCancek = '1.2';
+                                } else if (results[0].actiongamenow === '4'){
+                                    numberCancek = '1.3';
+                                }else if (results[0].actiongamenow === '5'){
+                                    numberCancek = '1.4';
+                                }else if (results[0].actiongamenow === '5'){
+                                    numberCancek = '1.5';
+                                } else {
+                                    numberCancek = '1'
+                                }
                                 const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
-                                actiongamenow = '1' WHERE phonenumber ='${username}'`;
+                                actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
@@ -567,6 +581,7 @@ exports.RollbackGaming = async (req, res) => {
     const amount = req.body.amount;
     const username = req.body.playerId;
     const txnId = req.body.txnId;
+    let numberCancek = '0';
     let spl = `SELECT credit, bet_latest, idplaygame, actiongamenow, roundId FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -579,37 +594,26 @@ exports.RollbackGaming = async (req, res) => {
                             const balanceamount = parseFloat(amount);
                             const balanceNow = balanceUser + results[0].bet_latest;
                             if (results[0].actiongamenow === '1' || results[0].actiongamenow === '2') {
-                                if (results[0].roundId === txnId) {
-                                    if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
-                                        numberCancek = '2';
-                                    } else {
-                                        let number = parseInt(results[0].actiongamenow) + 1
-                                        let stringNumber = number.toString();
-                                        numberCancek = stringNumber;
-                                    }
-
-                                    const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                                    actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
-                                    connection.query(sql_update, (error, resultsGame) => {
-                                        if (error) { console.log(error) }
-                                        else {
-                                            res.status(201).json({
-                                                extTxnId: txnId,
-                                                currency: "THB",
-                                                balance: balanceNow,
-                                                action: results[0].actiongamenow
-                                            });
-                                        }
-                                    });
+                                if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
+                                    numberCancek = '2';
                                 } else {
-                                    res.status(201).json({
-                                        extTxnId: txnId,
-                                        currency: "THB",
-                                        balance: balanceUser,
-                                        action: results[0].actiongamenow
-                                    });
+                                    let number = parseInt(results[0].actiongamenow) + 1
+                                    let stringNumber = number.toString();
+                                    numberCancek = stringNumber;
                                 }
-
+                                const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
+                                actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            extTxnId: txnId,
+                                            currency: "THB",
+                                            balance: balanceNow,
+                                            action: results[0].actiongamenow
+                                        });
+                                    }
+                                });
                             } else if (results[0].actiongamenow === '3' || results[0].actiongamenow === '4') {
                                 if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                                     numberCancek = '2';
