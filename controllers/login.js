@@ -856,6 +856,7 @@ exports.SettleBetAsk = async (req, res) => {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
+        const balanceUser = parseFloat(results[0].credit);
         let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${trans_id}'`;
         connection.query(splroundId, (error, resultsroundId) => {
           if (error) {
@@ -863,7 +864,6 @@ exports.SettleBetAsk = async (req, res) => {
           } else {
             if (resultsroundId.length === 0) {
               const namegame = results[0].playgameuser;
-              const balanceUser = parseFloat(results[0].credit);
               const balanceNow = balanceUser + amount;
               const post = {
                 username: account, gameid: 'ASKMEBET', bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
