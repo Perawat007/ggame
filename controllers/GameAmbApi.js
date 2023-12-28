@@ -494,7 +494,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                         });
                     }
                 } else {
-                    if (balanceUser < (balanceUser + results[0].bet_latest)) {
+                    if (results[0].actiongamenow !== 'Cancel1') {
                         let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${txnId}'`;
                         connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
@@ -564,8 +564,9 @@ exports.RollbackGaming = async (req, res) => {
                         const balanceUser = parseFloat(results[0].credit);
                         const balanceamount = parseFloat(amount);
                         const balanceNow = balanceUser + balanceamount;
+                        const numberCancek = parseInt(stringNumber) + 1;
                         const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                        actiongamenow = 'CanelBet' WHERE phonenumber ='${username}'`;
+                        actiongamenow = '${'Cancel'+ numberCancek}' WHERE phonenumber ='${username}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
                             else {
