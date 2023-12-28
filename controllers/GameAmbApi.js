@@ -56,7 +56,8 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
     const userAgentt = req.useragent;
     let merchantTxId = transferId;
     let balanceNow = 0;
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, bet_latest FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, bet_latest, idplaygame 
+    FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -78,12 +79,16 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                 } else {
                     let balanceturnover = results[0].turnover;
                     if (type === 1) {
-                        if (results[0].roundId !== serialNo) {
-                            balanceNow = balanceUser - amount;
+                        if (results[0].roundId === serialNo) {
+                            balanceNow = balanceUser;
                             merchantTxId = transferId;
 
-                        } else {
+                        } else if (results[0].idplaygame === transferId) {
                             balanceNow = balanceUser;
+                            merchantTxId = transferId;
+                        }
+                        else {
+                            balanceNow = balanceUser - amount;
                             merchantTxId = transferId;
                             // const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
                             // connection.query(sql_update, (error, resultsGame) => {
@@ -102,7 +107,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         merchantTxId = referenceId;
                         const post = {
                             username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                            userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: merchantTxId,
+                            userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
                             roundId: merchantTxId, balancebefore: balanceUser
                         };
                         let repost = repostGame.uploadLogRepostGame(post);
@@ -112,7 +117,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                     }
 
                     const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
-                    roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
+                    roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         if (error) { console.log(error) }
                         else {
