@@ -463,7 +463,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                 let balanceNow = 0;
                 let balanceturnover = results[0].turnover;
                 if (txnType === 'DEBIT') {
-                    if (balanceamount > 0) {
+                    if (amount > 0) {
                         if (balanceUser > balanceamount) {
                             if (results[0].roundId === txnId) {
                                 res.status(201).json({
