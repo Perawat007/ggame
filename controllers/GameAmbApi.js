@@ -495,7 +495,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                     }
                 } else {
                     if (balanceUser < (balanceUser + results[0].bet_latest)) {
-                        let splroundId = `SELECT roundId,  FROM repostgame WHERE roundId  ='${txnId}'`;
+                        let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${txnId}'`;
                         connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
                                 console.log(error);
