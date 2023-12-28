@@ -43,11 +43,11 @@ function hasSimilarData(gameplayturn, input, turnover, betPlay) {
 
 function convertToTwoDecimalPlaces(number) {
   if (!isNaN(number) && Number(number) % 1 !== 0) {
-      const strNumber = number.toString();
-      const decimalPlaces = strNumber.split(".")[1].length;
-      if (decimalPlaces > 2) {
-          return Math.round(number); // แปลงเป็นจำนวนเต็ม
-      }
+    const strNumber = number.toString();
+    const decimalPlaces = strNumber.split(".")[1].length;
+    if (decimalPlaces > 2) {
+      return Math.round(number); // แปลงเป็นจำนวนเต็ม
+    }
   }
   return number; // คืนค่าเดิมถ้าไม่เข้าเงื่อนไข
 }
@@ -750,18 +750,26 @@ exports.GetBalanceAsk = async (req, res) => {
   const agent = req.body.agent;
   const account = req.body.account;
   const authHeader = req.body.token;
-  username = 'member001';
 
-  let spl = `SELECT credit FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
+  let spl = `SELECT credit, tokenplaygame FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const balanceUser = parseFloat(results[0].credit);
-        res.status(201).json({
-          "status": 1,
-          "balance": balanceUser
-        });
+        if (results[0].tokenplaygame === authHeader) {
+          const balanceUser = parseFloat(results[0].credit);
+          res.status(201).json({
+            "status": 0,
+            "balance": balanceUser
+          });
+        } else {
+          const balanceUser = parseFloat(results[0].credit);
+          res.status(201).json({
+            "status": 3,
+            "balance": 0
+          });
+        }
+
       }
     })
   } catch (err) {
@@ -959,8 +967,8 @@ exports.PlayerBetJili = async (req, res) => {
             const namegame = results[0].playgameuser;
             const post = {
               username: results[0].username, gameid: 'JILI', bet: betAmount, win: winloseAmount, balance_credit: balanceNowwit,
-              userAgent: userAgent, platform: userAgent, namegame: namegame,  roundId: round, balancebefore: balanceUser, 
-              trans_id:reqId
+              userAgent: userAgent, platform: userAgent, namegame: namegame, roundId: round, balancebefore: balanceUser,
+              trans_id: reqId
             }
             let repost = repostGame.uploadLogRepostGame(post)
 
