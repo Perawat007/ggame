@@ -910,20 +910,37 @@ exports.CancelBetAsk = async (req, res) => {
   const account = req.body.account;
   const game_id = req.body.game_id;
   const amount = req.body.amount;
-  username = 'member001';
 
-  let spl = `SELECT credit FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
+  let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        let balanceNow = balanceUser + amount
-        res.status(201).json({
-          status: 1,
-          trans_id: trans_id,
-          balance: truncateToSingleDecimalPlace(balanceNow)
-        });
+        if (results[0].bet_latest > 0) {
+          let balanceNow = balanceUser + amount
+          const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest = '${0.00}', turnover='${balanceturnover}',roundId = '${trans_id}',
+          idplaygame = '${trans_id}', actiongamenow ='settleBet' WHERE phonenumber ='${account}'`;
+
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+
+            }
+          })
+          res.status(201).json({
+            status: 1,
+            trans_id: trans_id,
+            balance: truncateToSingleDecimalPlace(balanceNow)
+          });
+        } else {
+          res.status(201).json({
+            "status": 4,
+            "trans_id": trans_id,
+            "balance": balanceUser
+          });
+        }
+
       }
     })
   } catch (err) {
