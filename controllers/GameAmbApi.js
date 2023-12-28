@@ -475,7 +475,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                             } else {
                                 balanceNow = balanceUser - balanceamount;
                                 if (results[0].actiongamenow === '2'){
-                                    numberCancek = '1.1';
+                                    numberCancek = '1';
                                 } else if (results[0].actiongamenow === '3'){
                                     numberCancek = '1.2';
                                 } else if (results[0].actiongamenow === '4'){
@@ -636,7 +636,7 @@ exports.RollbackGaming = async (req, res) => {
                                         });
                                     }
                                 });
-                            } else if (results[0].actiongamenow === '5' || results[0].actiongamenow === '6') {
+                            } else if (results[0].actiongamenow === '5' || results[0].actiongamenow === '1.1') {
                                 if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                                     numberCancek = '2';
                                 } else {
