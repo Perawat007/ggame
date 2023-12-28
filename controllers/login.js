@@ -811,13 +811,13 @@ exports.PlaceBetAsk = async (req, res) => {
             platform = 'computer pc';
           }
 
-          const post = {
-            username: account, gameid: "ASKMEBET", bet: amount, win: amount, balance_credit: balanceNow,
-            userAgent: userAgent, platform: platform, trans_id: trans_id, namegame: namegame
-          }
-          let repost = repostGame.uploadLogRepostGameAsk(post)
+          // const post = {
+          //   username: account, gameid: "ASKMEBET", bet: amount, win: amount, balance_credit: balanceNow,
+          //   userAgent: userAgent, platform: platform, trans_id: trans_id, namegame: namegame
+          // }
+          // let repost = repostGame.uploadLogRepostGameAsk(post)
 
-          let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, amount)
+          // let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, amount)
 
           const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}', roundId = '${trans_id}'
           WHERE phonenumber ='${account}'`;
@@ -851,31 +851,50 @@ exports.SettleBetAsk = async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const userAgentt = req.useragent;
 
-  let spl = `SELECT credit, turnover, gameplayturn, playgameuser  FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
+  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
-        const namegame = results[0].playgameuser;
-        const balanceUser = parseFloat(results[0].credit);
-        const balanceNow = balanceUser + amount;
-        const post = {
-          username: account, gameid: "ASKMEBET", bet: 0, win: amount, balance_credit: balanceNow,
-          userAgent: userAgent, platform: userAgentt, trans_id: trans_id, namegame: namegame
-        }
-        let repost = repostGame.uploadLogRepostGameAsk(post)
+        let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundId}'`;
+        connection.query(splroundId, (error, resultsroundId) => {
+          if (error) {
+            console.log(error);
+          } else {
+            if (resultsroundId.length === 0) {
+              const namegame = results[0].playgameuser;
+              const balanceUser = parseFloat(results[0].credit);
+              const balanceNow = balanceUser + amount;
+              const post = {
+                username: usernameGame, gameid: ASKMEBET, bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: trans_id,
+                roundId: trans_id, balancebefore: balanceUser
+              };
+              let repost = repostGame.uploadLogRepostGame(post);
+              let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, amount)
 
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}' WHERE phonenumber ='${account}'`;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              status: 1,
-              trans_id: trans_id,
-              balance: truncateToSingleDecimalPlace(balanceNow)
-            });
+              const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}',roundId = '${trans_id}',
+              idplaygame = '${trans_id}', actiongamenow ='settleBet' WHERE phonenumber ='${account}'`;
+
+              connection.query(sql_update, (error, resultsGame) => {
+                if (error) { console.log(error) }
+                else {
+                  res.status(201).json({
+                    status: 1,
+                    trans_id: trans_id,
+                    balance: truncateToSingleDecimalPlace(balanceNow)
+                  });
+                }
+              });
+            } else {
+              res.status(201).json({
+                "status": 4,
+                "trans_id": trans_id,
+                "balance": balanceUser
+              });
+            }
           }
-        });
+        })
       }
     })
   } catch (err) {
