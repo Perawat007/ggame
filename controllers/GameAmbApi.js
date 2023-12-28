@@ -102,7 +102,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         else {
                             res.status(201).json({
                                 transferId: transferId,
-                                merchantTxId: serialNo,
+                                merchantTxId: transferId,
                                 acctId: acctId,
                                 balance: balanceNow,
                                 msg: "success",
