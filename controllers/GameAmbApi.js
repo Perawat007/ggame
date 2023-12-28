@@ -425,10 +425,13 @@ exports.gamingLogin = async (req, res) => {
             //console.log(balanceNum);
             if (error) { console.log(error) }
             else {
-                if (results[0].actiongamenow !== '1' || results[0].actiongamenow !== '0'){
-                    numberCancek = '1.1';
-                } else{
+                if (results[0].actiongamenow === '1') {
                     numberCancek = results[0].actiongamenow;
+                } else if (results[0].actiongamenow === '0') {
+                    numberCancek = results[0].actiongamenow;
+                }
+                else {
+                    numberCancek = '1.1';
                 }
                 const sql_update = `UPDATE member set actiongamenow = '${numberCancek}' WHERE phonenumber ='${playerId}'`;
                 connection.query(sql_update, (error, resultsGame) => {
@@ -485,15 +488,15 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                 });
                             } else {
                                 balanceNow = balanceUser - balanceamount;
-                                if (results[0].actiongamenow === '2'){
+                                if (results[0].actiongamenow === '2') {
                                     numberCancek = '1';
-                                } else if (results[0].actiongamenow === '3'){
+                                } else if (results[0].actiongamenow === '3') {
                                     numberCancek = '1.2';
-                                } else if (results[0].actiongamenow === '4'){
+                                } else if (results[0].actiongamenow === '4') {
                                     numberCancek = '1.3';
-                                }else if (results[0].actiongamenow === '5'){
+                                } else if (results[0].actiongamenow === '5') {
                                     numberCancek = '1.4';
-                                }else if (results[0].actiongamenow === '5'){
+                                } else if (results[0].actiongamenow === '5') {
                                     numberCancek = '1.5';
                                 } else {
                                     numberCancek = '1'
@@ -508,7 +511,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                             extTxnId: txnId,
                                             currency: "THB",
                                             balance: balanceNow,
-                                            action: results[0].actiongamenow + "D"
+                                            action: numberCancek + "D"
                                         });
                                     }
                                 });
