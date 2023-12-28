@@ -501,7 +501,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                     }
 
                 } else {
-                    if (amount > 0) {
+                    if (amount >= -1) {
                         if (results[0].actiongamenow !== '2') {
                             let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${txnId}'`;
                             connection.query(splroundId, (error, resultsroundId) => {
