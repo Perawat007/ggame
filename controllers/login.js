@@ -865,7 +865,7 @@ exports.SettleBetAsk = async (req, res) => {
             res.status(201).json({
               status: 1,
               trans_id: trans_id,
-              balance: balanceNow
+              balance: truncateToSingleDecimalPlace(balanceNow)
             });
           }
         });
