@@ -417,7 +417,6 @@ exports.HabaneroGame = async (req, res) => {
 http://localhost:5000/post/gaming/login //getbalance
 exports.gamingLogin = async (req, res) => {
     const playerId = req.body.playerId;
-    const username = '0990825941';
     let numberCancek = '1';
     let spl = `SELECT credit, actiongamenow FROM member WHERE phonenumber ='${playerId}' AND status_delete='N'`;
     try {
@@ -431,14 +430,14 @@ exports.gamingLogin = async (req, res) => {
                 } else{
                     numberCancek = results[0].actiongamenow;
                 }
-                const sql_update = `UPDATE member set actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                const sql_update = `UPDATE member set actiongamenow = '${numberCancek}' WHERE phonenumber ='${playerId}'`;
                 connection.query(sql_update, (error, resultsGame) => {
                     if (error) { console.log(error) }
                     else {
                         res.status(201).json({
                             currency: "THB",
                             balance: balanceNum,
-                            action: results[0].actiongamenow
+                            action: numberCancek
                         });
                     }
                 });
