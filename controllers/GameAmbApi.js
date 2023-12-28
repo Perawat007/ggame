@@ -167,7 +167,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                 });
                                 
                             } else if (results[0].actiongamenow === 'PlaceBet' && results[0].bet_latest > 0) {
-                                balanceNow = balanceUser + amount;
+                                balanceNow = balanceUser + results[0].bet_latest;
                                 merchantTxId = referenceId;
                                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow = 'Cancel_Bet',
                                 roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
