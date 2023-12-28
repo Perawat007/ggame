@@ -463,36 +463,43 @@ exports.UpdateBalanceGaming = async (req, res) => {
                 let balanceNow = 0;
                 let balanceturnover = results[0].turnover;
                 if (txnType === 'DEBIT') {
-                    if (balanceUser > balanceamount) {
-                        if (results[0].roundId === txnId) {
-                            res.status(201).json({
-                                extTxnId: txnId,
-                                currency: "THB",
-                                balance: balanceUser
-                            });
+                    if (balanceamount > 0) {
+                        if (balanceUser > balanceamount) {
+                            if (results[0].roundId === txnId) {
+                                res.status(201).json({
+                                    extTxnId: txnId,
+                                    currency: "THB",
+                                    balance: balanceUser
+                                });
+                            } else {
+                                balanceNow = balanceUser - balanceamount;
+                                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
+                                actiongamenow = '1' WHERE phonenumber ='${username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                        res.status(201).json({
+                                            extTxnId: txnId,
+                                            currency: "THB",
+                                            balance: balanceNow
+                                        });
+                                    }
+                                });
+                            }
                         } else {
-                            balanceNow = balanceUser - balanceamount;
-                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
-                            actiongamenow = '1' WHERE phonenumber ='${username}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) { console.log(error) }
-                                else {
-                                    console.log(txnType, balanceNow, balanceUser, balanceamount)
-                                    res.status(201).json({
-                                        extTxnId: txnId,
-                                        currency: "THB",
-                                        balance: balanceNow
-                                    });
-                                }
+                            res.status(201).json({
+                                message: "Bad request",
+                                code: 400
                             });
                         }
-
                     } else {
                         res.status(201).json({
                             message: "Not enough available balance",
                             code: 402
                         });
                     }
+
                 } else {
                     if (results[0].actiongamenow !== '2') {
                         let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${txnId}'`;
@@ -564,15 +571,15 @@ exports.RollbackGaming = async (req, res) => {
                         const balanceUser = parseFloat(results[0].credit);
                         const balanceamount = parseFloat(amount);
                         const balanceNow = balanceUser + balanceamount;
-                        
-                        if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1'){
+
+                        if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                             numberCancek = '2';
                         } else {
                             let number = parseInt(results[0].actiongamenow) + 1
                             let stringNumber = number.toString();
                             numberCancek = stringNumber;
-                        }  
-                        
+                        }
+
                         const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
                         actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
                         connection.query(sql_update, (error, resultsGame) => {
