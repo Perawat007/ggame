@@ -891,10 +891,11 @@ exports.CancelBetAsk = async (req, res) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
+        let balanceNow = balanceUser + account
         res.status(201).json({
           status: 1,
           trans_id: trans_id,
-          balance: balanceUser
+          balance: balanceNow
         });
       }
     })
