@@ -204,31 +204,38 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                 serialNo: serialNo
                             });
                         } else {
-                            balanceNow = balanceUser + amount;
-                            merchantTxId = referenceId;
-                            const post = {
-                                username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
-                                roundId: merchantTxId, balancebefore: balanceUser
-                            };
-                            let repost = repostGame.uploadLogRepostGame(post);
-                            balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
-                            actiongamenow = 'Settle_Bet', roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) { console.log(error) }
-                                else {
-                                    res.status(201).json({
-                                        transferId: transferId,
-                                        merchantTxId: merchantTxId,
-                                        acctId: acctId,
-                                        balance: balanceNow,
-                                        msg: "success",
-                                        code: 0,
-                                        serialNo: serialNo
-                                    });
-                                }
-                            });
+                            if (results[0].actiongamenow === 'PlaceBet') {
+                                balanceNow = balanceUser + amount;
+                                merchantTxId = referenceId;
+                                const post = {
+                                    username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
+                                    roundId: merchantTxId, balancebefore: balanceUser
+                                };
+                                let repost = repostGame.uploadLogRepostGame(post);
+                                balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
+                                actiongamenow = 'Settle_Bet', roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            transferId: transferId,
+                                            merchantTxId: merchantTxId,
+                                            acctId: acctId,
+                                            balance: balanceNow,
+                                            msg: "success",
+                                            code: 0,
+                                            serialNo: serialNo
+                                        });
+                                    }
+                                });
+                            } else {
+                                res.status(201).json({
+                                    msg: "Reference No Not found",
+                                    code: 109
+                                });
+                            }
                         }
                     } else {
                         balanceNow = balanceUser + amount;
