@@ -79,12 +79,10 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                     let balanceturnover = results[0].turnover;
                     if (type === 1) {
                         if (results[0].roundId === serialNo) {
+                            balanceNow = balanceUser;
                             const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
-                                else {
-                                    balanceNow = balanceUser;
-                                }
                             });
                         } else {
                             balanceNow = balanceUser - amount;
