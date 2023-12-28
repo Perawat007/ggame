@@ -866,7 +866,7 @@ exports.SettleBetAsk = async (req, res) => {
               const balanceUser = parseFloat(results[0].credit);
               const balanceNow = balanceUser + amount;
               const post = {
-                username: usernameGame, gameid: ASKMEBET, bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                username: account, gameid: ASKMEBET, bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
                 userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: trans_id,
                 roundId: trans_id, balancebefore: balanceUser
               };
