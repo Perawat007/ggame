@@ -87,8 +87,10 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                             } else if (results[0].idplaygame === transferId) {
                                 balanceNow = balanceUser;
                                 merchantTxId = transferId;
-                            }
-                            else {
+                            } else if (results[0].actiongamenow === 'Cancel_BetNotUpdate'){
+                                balanceNow = balanceUser;
+                                merchantTxId = transferId;
+                            } else {
                                 balanceNow = balanceUser - amount;
                                 merchantTxId = transferId;
                                 // const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
@@ -202,10 +204,17 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                     }
                                 })
                             } else {
-                                res.status(201).json({
-                                    msg: "Reference No Not found",
-                                    code: 109
-                                });
+                                const sql_update = `UPDATE member set actiongamenow = 'Cancel_BetNotUpdate',roundId='${serialNo}', idplaygame = '${transferId}' 
+                                WHERE phonenumber ='${acctId}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            msg: "Reference No Not found",
+                                            code: 109
+                                        });
+                                    }
+                                })
                             }
                         }
                     } else if (type === 4) {
