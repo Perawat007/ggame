@@ -258,10 +258,17 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                     }
                                 });
                             } else {
-                                res.status(201).json({
-                                    msg: "Reference No Not found",
-                                    code: 109
-                                });
+                                const sql_update = `UPDATE member set actiongamenow = 'Settle_Bet_Fail', roundId='${serialNo}', idplaygame = '${transferId}' 
+                                WHERE phonenumber ='${acctId}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            msg: "Reference No Not found",
+                                            code: 109
+                                        });
+                                    }
+                                })
                             }
                         }
                     } else {
