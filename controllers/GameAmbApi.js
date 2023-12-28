@@ -147,15 +147,23 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                             if (results[0].actiongamenow === 'PlaceBetFail') {
                                 balanceNow = balanceUser;
                                 merchantTxId = referenceId;
-                                res.status(201).json({
-                                    transferId: transferId,
-                                    merchantTxId: merchantTxId,
-                                    acctId: acctId,
-                                    balance: balanceNow,
-                                    msg: "success",
-                                    code: 0,
-                                    serialNo: serialNo
+                                const sql_update = `UPDATE member set credit='${balanceNow}', actiongamenow = 'Cancel_Bet_Fail',
+                                roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            transferId: transferId,
+                                            merchantTxId: merchantTxId,
+                                            acctId: acctId,
+                                            balance: balanceNow,
+                                            msg: "success",
+                                            code: 0,
+                                            serialNo: serialNo
+                                        });
+                                    }
                                 });
+                                
                             } else if (results[0].actiongamenow === 'PlaceBet' && results[0].bet_latest > 0) {
                                 balanceNow = balanceUser + amount;
                                 merchantTxId = referenceId;
