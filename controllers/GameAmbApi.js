@@ -56,7 +56,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
     const userAgentt = req.useragent;
     let merchantTxId = transferId;
     let balanceNow = 0;
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, bet_latest, idplaygame 
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, bet_latest, idplaygame, actiongamenow 
     FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -77,9 +77,9 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         serialNo: serialNo
                     });
                 } else {
-                    if (balanceUser > amount) {
-                        let balanceturnover = results[0].turnover;
-                        if (type === 1) {
+                    let balanceturnover = results[0].turnover;
+                    if (type === 1) {
+                        if (balanceUser > amount) {
                             if (results[0].roundId === serialNo) {
                                 balanceNow = balanceUser;
                                 merchantTxId = transferId;
@@ -100,34 +100,126 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                 // }
                                 // let repost = repostGame.uploadLogRepostGameAsk(post)
                             }
-                        } else if (type === 2) {
-                            if (results[0].roundId === serialNo) {
+
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow = 'PlaceBet',
+                                roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        transferId: transferId,
+                                        merchantTxId: merchantTxId,
+                                        acctId: acctId,
+                                        balance: balanceNow,
+                                        msg: "success",
+                                        code: 0,
+                                        serialNo: serialNo
+                                    });
+                                }
+                            });
+                        } else {
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow = 'PlaceBetFail',
+                                roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        msg: "Insufficient Balance",
+                                        code: 50110
+                                    });
+                                }
+                            })
+                        }
+                    } else if (type === 2) {
+                        if (results[0].roundId === serialNo) {
+                            balanceNow = balanceUser;
+                            merchantTxId = referenceId;
+                            res.status(201).json({
+                                transferId: transferId,
+                                merchantTxId: merchantTxId,
+                                acctId: acctId,
+                                balance: balanceNow,
+                                msg: "success",
+                                code: 0,
+                                serialNo: serialNo
+                            });
+                        } else {
+                            if (results[0].actiongamenow === 'PlaceBetFail') {
                                 balanceNow = balanceUser;
                                 merchantTxId = referenceId;
+                                res.status(201).json({
+                                    transferId: transferId,
+                                    merchantTxId: merchantTxId,
+                                    acctId: acctId,
+                                    balance: balanceNow,
+                                    msg: "success",
+                                    code: 0,
+                                    serialNo: serialNo
+                                });
                             } else {
                                 balanceNow = balanceUser + amount;
                                 merchantTxId = referenceId;
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow = 'Cancel_Bet',
+                                roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            transferId: transferId,
+                                            merchantTxId: merchantTxId,
+                                            acctId: acctId,
+                                            balance: balanceNow,
+                                            msg: "success",
+                                            code: 0,
+                                            serialNo: serialNo
+                                        });
+                                    }
+                                });
                             }
-                        } else if (type === 4) {
-                            if (results[0].roundId === serialNo) {
-                                balanceNow = balanceUser;
-                                merchantTxId = referenceId;
-                            } else {
-                                balanceNow = balanceUser + amount;
-                                merchantTxId = referenceId;
-                                const post = {
-                                    username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
-                                    roundId: merchantTxId, balancebefore: balanceUser
-                                };
-                                let repost = repostGame.uploadLogRepostGame(post);
-                                balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
-                            }
+                        }
+                    } else if (type === 4) {
+                        if (results[0].roundId === serialNo) {
+                            balanceNow = balanceUser;
+                            merchantTxId = referenceId;
+                            res.status(201).json({
+                                transferId: transferId,
+                                merchantTxId: merchantTxId,
+                                acctId: acctId,
+                                balance: balanceNow,
+                                msg: "success",
+                                code: 0,
+                                serialNo: serialNo
+                            });
                         } else {
                             balanceNow = balanceUser + amount;
+                            merchantTxId = referenceId;
+                            const post = {
+                                username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
+                                roundId: merchantTxId, balancebefore: balanceUser
+                            };
+                            let repost = repostGame.uploadLogRepostGame(post);
+                            balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
+                            actiongamenow = 'Settle_Bet', roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        transferId: transferId,
+                                        merchantTxId: merchantTxId,
+                                        acctId: acctId,
+                                        balance: balanceNow,
+                                        msg: "success",
+                                        code: 0,
+                                        serialNo: serialNo
+                                    });
+                                }
+                            });
                         }
-
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
+                    } else {
+                        balanceNow = balanceUser + amount;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',
                         roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
@@ -142,11 +234,6 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                     serialNo: serialNo
                                 });
                             }
-                        });
-                    } else {
-                        res.status(201).json({
-                            msg: "Insufficient Balance",
-                            code: 50110
                         });
                     }
                 }
