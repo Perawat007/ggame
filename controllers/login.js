@@ -927,7 +927,7 @@ exports.CancelBetAsk = async (req, res) => {
   const game_id = req.body.game_id;
   const amount = req.body.amount;
 
-  let spl = `SELECT credit, bet_latest,  FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
+  let spl = `SELECT credit, bet_latest, roundId FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
