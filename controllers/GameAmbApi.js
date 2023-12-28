@@ -104,7 +104,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         merchantTxId = referenceId;
                     } else if (type === 4) {
                         if (results[0].roundId === serialNo) {
-                            balanceNow = balanceUser - amount;
+                            balanceNow = balanceUser;
                             merchantTxId = referenceId;
                         } else {
                             balanceNow = balanceUser + amount;
