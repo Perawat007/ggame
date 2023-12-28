@@ -184,6 +184,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                     }
                                 });
                             } else if (results[0].actiongamenow === 'Settle_Bet') {
+                                merchantTxId = referenceId;
                                 res.status(201).json({
                                     transferId: transferId,
                                     merchantTxId: merchantTxId,
