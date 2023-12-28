@@ -530,7 +530,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                             }
                         }
                     });
-                   
+
                 }
 
             }
@@ -547,25 +547,34 @@ http://localhost:5000/post/gaming/rollback
 exports.RollbackGaming = async (req, res) => {
     const amount = req.body.amount;
     const username = req.body.playerId;
-    let spl = `SELECT credit FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                const balanceUser = parseFloat(results[0].credit);
-                const balanceamount = parseFloat(amount);
-                const balanceNow = balanceUser + balanceamount;
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${username}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
-                            currency: "THB",
-                            balance: balanceNow
-                        });
-                    }
-                });
+                if (results[0].bet_latest > 0) {
+                    const balanceUser = parseFloat(results[0].credit);
+                    const balanceamount = parseFloat(amount);
+                    const balanceNow = balanceUser + balanceamount;
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}' WHERE phonenumber ='${username}'`;
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) { console.log(error) }
+                        else {
+                            res.status(201).json({
+                                extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                                currency: "THB",
+                                balance: balanceNow
+                            });
+                        }
+                    });
+                } else {
+                    const balanceUser = parseFloat(results[0].credit);
+                    res.status(201).json({
+                        extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                        currency: "THB",
+                        balance: balanceUser
+                    });
+                }
             }
         })
     } catch (err) {
