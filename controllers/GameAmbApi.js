@@ -450,6 +450,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
     const txnId = req.body.txnId;
     const txnEventType = req.body.txnEventType
     const userAgent = req.headers['user-agent'];
+    const userAgentt = req.useragent;
     let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -463,11 +464,6 @@ exports.UpdateBalanceGaming = async (req, res) => {
                 if (txnType === 'DEBIT') {
                     if (balanceUser > balanceamount) {
                         balanceNow = balanceUser - balanceamount;
-                        const post = {
-                            username: username, gameid: txnEventType, bet: 0, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: txnId, namegame: namegame
-                        }
-                        let repost = repostGame.uploadLogRepostGameAsk(post)
-                        balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, 0)
                         const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', turnover='${balanceturnover}'
                     WHERE phonenumber ='${username}'`;
                         connection.query(sql_update, (error, resultsGame) => {
@@ -475,25 +471,27 @@ exports.UpdateBalanceGaming = async (req, res) => {
                             else {
                                 console.log(txnType, balanceNow, balanceUser, balanceamount)
                                 res.status(201).json({
-                                    message: "Not enough available balance",
-                                    code: 402
+                                    extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                                    currency: "THB",
+                                    balance: balanceNow
                                 });
                             }
                         });
                     } else {
                         res.status(201).json({
-                            extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
-                            currency: "THB",
-                            balance: balanceNow
+                            message: "Not enough available balance",
+                            code: 402
                         });
                     }
                 } else {
                     balanceNow = balanceUser + balanceamount;
                     const post = {
-                        username: username, gameid: txnEventType, bet: balanceamount, win: balanceamount, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: txnId, namegame: namegame
-                    }
-                    let repost = repostGame.uploadLogRepostGameAsk(post)
-                    balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, balanceamount)
+                        username: username, gameid: "MICRO", bet: results[0].bet_latest, win: balanceamount, balance_credit: balanceNow,
+                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnId,
+                        roundId: txnId, balancebefore: balanceUser
+                    };
+                    let repost = repostGame.uploadLogRepostGame(post);
+                    balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, results[0].bet_latest)
                     const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', turnover='${balanceturnover}'
                 WHERE phonenumber ='${username}'`;
                     connection.query(sql_update, (error, resultsGame) => {
