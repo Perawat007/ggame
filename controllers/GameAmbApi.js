@@ -548,35 +548,36 @@ exports.RollbackGaming = async (req, res) => {
     const amount = req.body.amount;
     const username = req.body.playerId;
     const txnId = req.body.txnId;
-    let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, idplaygame FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                // if (results[0].bet_latest > 0) {
-                   
-                // } else {
-                //     const balanceUser = parseFloat(results[0].credit);
-                //     res.status(201).json({
-                //         extTxnId: txnId,
-                //         currency: "THB",
-                //         balance: balanceUser
-                //     });
-                // }
-                const balanceUser = parseFloat(results[0].credit);
-                const balanceamount = parseFloat(amount);
-                const balanceNow = balanceUser + balanceamount;
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}' WHERE phonenumber ='${username}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            extTxnId: txnId,
-                            currency: "THB",
-                            balance: balanceNow
-                        });
-                    }
-                });
+                if (results[0].idplaygame !== txnId) {
+                    const balanceUser = parseFloat(results[0].credit);
+                    const balanceamount = parseFloat(amount);
+                    const balanceNow = balanceUser + balanceamount;
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}', idplaygame = ${txnId}, 
+                    WHERE phonenumber ='${username}'`;
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) { console.log(error) }
+                        else {
+                            res.status(201).json({
+                                extTxnId: txnId,
+                                currency: "THB",
+                                balance: balanceNow
+                            });
+                        }
+                    });
+                } else {
+                    const balanceUser = parseFloat(results[0].credit);
+                    res.status(201).json({
+                        extTxnId: txnId,
+                        currency: "THB",
+                        balance: balanceUser
+                    });
+                }
+
             }
         })
     } catch (err) {
