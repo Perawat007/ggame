@@ -83,7 +83,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
                                 else {
-                                    balanceNow = balanceUser - amount;
+                                    balanceNow = balanceUser;
                                 }
                             });
                         } else {
