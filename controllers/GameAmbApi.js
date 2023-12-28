@@ -87,7 +87,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                             } else if (results[0].idplaygame === transferId) {
                                 balanceNow = balanceUser;
                                 merchantTxId = transferId;
-                            } else if (results[0].actiongamenow === 'Cancel_BetNotUpdate'){
+                            } else if (results[0].actiongamenow === 'Cancel_BetNotUpdate') {
                                 balanceNow = balanceUser;
                                 merchantTxId = transferId;
                             } else {
@@ -165,7 +165,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                         });
                                     }
                                 });
-                                
+
                             } else if (results[0].actiongamenow === 'PlaceBet' && results[0].bet_latest > 0) {
                                 balanceNow = balanceUser + results[0].bet_latest;
                                 merchantTxId = referenceId;
@@ -450,7 +450,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
     const txnId = req.body.txnId;
     const txnEventType = req.body.txnEventType
     const userAgent = req.headers['user-agent'];
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -461,12 +461,32 @@ exports.UpdateBalanceGaming = async (req, res) => {
                 let balanceNow = 0;
                 let balanceturnover = results[0].turnover;
                 if (txnType === 'DEBIT') {
-                    balanceNow = balanceUser - balanceamount;
-                    const post = {
-                        username: username, gameid: txnEventType, bet: 0, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: txnId, namegame: namegame
+                    if (balanceUser > balanceamount) {
+                        balanceNow = balanceUser - balanceamount;
+                        const post = {
+                            username: username, gameid: txnEventType, bet: 0, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: txnId, namegame: namegame
+                        }
+                        let repost = repostGame.uploadLogRepostGameAsk(post)
+                        balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, 0)
+                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', turnover='${balanceturnover}'
+                    WHERE phonenumber ='${username}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                res.status(201).json({
+                                    message: "Not enough available balance",
+                                    code: 402
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                            currency: "THB",
+                            balance: balanceNow
+                        });
                     }
-                    let repost = repostGame.uploadLogRepostGameAsk(post)
-                    balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, 0)
                 } else {
                     balanceNow = balanceUser + balanceamount;
                     const post = {
@@ -474,20 +494,21 @@ exports.UpdateBalanceGaming = async (req, res) => {
                     }
                     let repost = repostGame.uploadLogRepostGameAsk(post)
                     balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, balanceamount)
-                }
-                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${0}', turnover='${balanceturnover}'
+                    const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', turnover='${balanceturnover}'
                 WHERE phonenumber ='${username}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        console.log(txnType, balanceNow, balanceUser, balanceamount)
-                        res.status(201).json({
-                            extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
-                            currency: "THB",
-                            balance: balanceNow
-                        });
-                    }
-                });
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) { console.log(error) }
+                        else {
+                            console.log(txnType, balanceNow, balanceUser, balanceamount)
+                            res.status(201).json({
+                                extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
+                                currency: "THB",
+                                balance: balanceNow
+                            });
+                        }
+                    });
+                }
+
             }
         })
     } catch (err) {
