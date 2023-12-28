@@ -883,6 +883,7 @@ exports.CancelBetAsk = async (req, res) => {
   const agent = req.body.agent;
   const account = req.body.account;
   const game_id = req.body.game_id;
+  const amount = req.body.amount;
   username = 'member001';
 
   let spl = `SELECT credit FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
@@ -891,11 +892,11 @@ exports.CancelBetAsk = async (req, res) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        let balanceNow = balanceUser + account
+        let balanceNow = balanceUser + amount
         res.status(201).json({
           status: 1,
           trans_id: trans_id,
-          balance: balanceNow
+          balance: truncateToSingleDecimalPlace(balanceNow)
         });
       }
     })
