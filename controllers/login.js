@@ -759,7 +759,7 @@ exports.GetBalanceAsk = async (req, res) => {
         if (results[0].tokenplaygame === authHeader) {
           const balanceUser = parseFloat(results[0].credit);
           res.status(201).json({
-            "status": 0,
+            "status": 1,
             "balance": balanceUser
           });
         } else {
