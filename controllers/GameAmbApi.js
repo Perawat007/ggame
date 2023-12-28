@@ -572,50 +572,57 @@ exports.RollbackGaming = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                if (results[0].actiongamenow !== '0') {
-                    if (results[0].idplaygame !== txnId) {
-                        const balanceUser = parseFloat(results[0].credit);
-                        const balanceamount = parseFloat(amount);
-                        const balanceNow = balanceUser + balanceamount;
+                if (amount >= -1) {
+                    if (results[0].actiongamenow !== '0') {
+                        if (results[0].idplaygame !== txnId) {
+                            const balanceUser = parseFloat(results[0].credit);
+                            const balanceamount = parseFloat(amount);
+                            const balanceNow = balanceUser + balanceamount;
 
-                        if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
-                            numberCancek = '2';
+                            if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
+                                numberCancek = '2';
+                            } else {
+                                let number = parseInt(results[0].actiongamenow) + 1
+                                let stringNumber = number.toString();
+                                numberCancek = stringNumber;
+                            }
+
+                            const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
+                            actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        extTxnId: txnId,
+                                        currency: "THB",
+                                        balance: balanceNow
+                                    });
+                                }
+                            });
                         } else {
-                            let number = parseInt(results[0].actiongamenow) + 1
-                            let stringNumber = number.toString();
-                            numberCancek = stringNumber;
+                            const balanceUser = parseFloat(results[0].credit);
+                            res.status(201).json({
+                                extTxnId: txnId,
+                                currency: "THB",
+                                balance: balanceUser
+                            });
                         }
-
-                        const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                        actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                    } else {
+                        const sql_update = `UPDATE member set actiongamenow = 'CanelFail' WHERE phonenumber ='${username}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
                             else {
                                 res.status(201).json({
-                                    extTxnId: txnId,
-                                    currency: "THB",
-                                    balance: balanceNow
+                                    code: 404,
+                                    message: "player/transaction not found",
                                 });
                             }
                         });
-                    } else {
-                        const balanceUser = parseFloat(results[0].credit);
-                        res.status(201).json({
-                            extTxnId: txnId,
-                            currency: "THB",
-                            balance: balanceUser
-                        });
                     }
                 } else {
-                    const sql_update = `UPDATE member set actiongamenow = 'CanelFail' WHERE phonenumber ='${username}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                code: 404,
-                                message: "player/transaction not found",
-                            });
-                        }
+                    res.status(201).json({
+                        message: "Bad request",
+                        code: 400
                     });
                 }
             }
