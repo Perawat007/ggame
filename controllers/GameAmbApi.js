@@ -438,6 +438,7 @@ exports.gamingLogin = async (req, res) => {
                         res.status(201).json({
                             currency: "THB",
                             balance: balanceNum,
+                            action: results[0].actiongamenow
                         });
                     }
                 });
@@ -507,7 +508,8 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                         res.status(201).json({
                                             extTxnId: txnId,
                                             currency: "THB",
-                                            balance: balanceNow
+                                            balance: balanceNow,
+                                            action: results[0].actiongamenow + "D"
                                         });
                                     }
                                 });
@@ -551,7 +553,8 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                                 res.status(201).json({
                                                     extTxnId: txnId,
                                                     currency: "THB",
-                                                    balance: balanceNow
+                                                    balance: balanceNow,
+                                                    action: results[0].actiongamenow + 'C'
                                                 });
                                             }
                                         });
