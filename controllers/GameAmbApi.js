@@ -77,71 +77,78 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         serialNo: serialNo
                     });
                 } else {
-                    let balanceturnover = results[0].turnover;
-                    if (type === 1) {
-                        if (results[0].roundId === serialNo) {
-                            balanceNow = balanceUser;
-                            merchantTxId = transferId;
+                    if (balanceUser > amount) {
+                        let balanceturnover = results[0].turnover;
+                        if (type === 1) {
+                            if (results[0].roundId === serialNo) {
+                                balanceNow = balanceUser;
+                                merchantTxId = transferId;
 
-                        } else if (results[0].idplaygame === transferId) {
-                            balanceNow = balanceUser;
-                            merchantTxId = transferId;
-                        }
-                        else {
-                            balanceNow = balanceUser - amount;
-                            merchantTxId = transferId;
-                            // const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
-                            // connection.query(sql_update, (error, resultsGame) => {
-                            //     if (error) { console.log(error) }
-                            // });
-                            // const post = {
-                            //     username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
-                            // }
-                            // let repost = repostGame.uploadLogRepostGameAsk(post)
-                        }
-                    } else if (type === 2) {
-                        if (results[0].roundId === serialNo) {
-                            balanceNow = balanceUser;
-                            merchantTxId = referenceId;
+                            } else if (results[0].idplaygame === transferId) {
+                                balanceNow = balanceUser;
+                                merchantTxId = transferId;
+                            }
+                            else {
+                                balanceNow = balanceUser - amount;
+                                merchantTxId = transferId;
+                                // const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
+                                // connection.query(sql_update, (error, resultsGame) => {
+                                //     if (error) { console.log(error) }
+                                // });
+                                // const post = {
+                                //     username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
+                                // }
+                                // let repost = repostGame.uploadLogRepostGameAsk(post)
+                            }
+                        } else if (type === 2) {
+                            if (results[0].roundId === serialNo) {
+                                balanceNow = balanceUser;
+                                merchantTxId = referenceId;
+                            } else {
+                                balanceNow = balanceUser + amount;
+                                merchantTxId = referenceId;
+                            }
+                        } else if (type === 4) {
+                            if (results[0].roundId === serialNo) {
+                                balanceNow = balanceUser;
+                                merchantTxId = referenceId;
+                            } else {
+                                balanceNow = balanceUser + amount;
+                                merchantTxId = referenceId;
+                                const post = {
+                                    username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
+                                    roundId: merchantTxId, balancebefore: balanceUser
+                                };
+                                let repost = repostGame.uploadLogRepostGame(post);
+                                balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
+                            }
                         } else {
                             balanceNow = balanceUser + amount;
-                            merchantTxId = referenceId;
                         }
-                    } else if (type === 4) {
-                        if (results[0].roundId === serialNo) {
-                            balanceNow = balanceUser;
-                            merchantTxId = referenceId;
-                        } else {
-                            balanceNow = balanceUser + amount;
-                            merchantTxId = referenceId;
-                            const post = {
-                                username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
-                                roundId: merchantTxId, balancebefore: balanceUser
-                            };
-                            let repost = repostGame.uploadLogRepostGame(post);
-                            balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
-                        }
+
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
+                        roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    transferId: transferId,
+                                    merchantTxId: merchantTxId,
+                                    acctId: acctId,
+                                    balance: balanceNow,
+                                    msg: "success",
+                                    code: 0,
+                                    serialNo: serialNo
+                                });
+                            }
+                        });
                     } else {
-                        balanceNow = balanceUser + amount;
+                        res.status(201).json({
+                            msg: "Insufficient Balance",
+                            code: 50110
+                        });
                     }
-
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
-                    roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                transferId: transferId,
-                                merchantTxId: merchantTxId,
-                                acctId: acctId,
-                                balance: balanceNow,
-                                msg: "success",
-                                code: 0,
-                                serialNo: serialNo
-                            });
-                        }
-                    });
                 }
             }
         })
