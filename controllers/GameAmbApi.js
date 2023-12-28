@@ -51,8 +51,9 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
     const transferId = req.body.transferId;
     const amount = req.body.amount;
     const type = req.body.type;
+    const referenceId = req.body.referenceId;
     const userAgent = req.headers['user-agent'];
-
+    let merchantTxId = transferId
     let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -77,6 +78,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                     let balanceturnover = results[0].turnover;
                     if (type === 1) {
                         balanceNow = balanceUser - amount;
+                        merchantTxId = transferId;
                         const post = {
                             username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
                         }
@@ -90,7 +92,8 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         let repost = repostGame.uploadLogRepostGameAsk(post)
 
                     } else if (type === 4) {
-                        balanceNow = balanceUser - amount;
+                        balanceNow = balanceUser + amount;
+                        merchantTxId = referenceId;
                     } else {
                         balanceNow = balanceUser + amount;
                     }
@@ -102,7 +105,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         else {
                             res.status(201).json({
                                 transferId: transferId,
-                                merchantTxId: transferId,
+                                merchantTxId: merchantTxId,
                                 acctId: acctId,
                                 balance: balanceNow,
                                 msg: "success",
