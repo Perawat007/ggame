@@ -435,17 +435,11 @@ exports.gamingLogin = async (req, res) => {
                 connection.query(sql_update, (error, resultsGame) => {
                     if (error) { console.log(error) }
                     else {
-                        console.log(txnType, balanceNow, balanceUser, balanceamount)
                         res.status(201).json({
-                            extTxnId: txnId,
                             currency: "THB",
-                            balance: balanceNow
+                            balance: balanceNum,
                         });
                     }
-                });
-                res.status(201).json({
-                    currency: "THB",
-                    balance: balanceNum,
                 });
             }
         })
