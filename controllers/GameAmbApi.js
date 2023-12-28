@@ -156,7 +156,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                     code: 0,
                                     serialNo: serialNo
                                 });
-                            } else {
+                            } else if (results[0].actiongamenow === 'PlaceBet') {
                                 balanceNow = balanceUser + amount;
                                 merchantTxId = referenceId;
                                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow = 'Cancel_Bet',
@@ -174,6 +174,11 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                             serialNo: serialNo
                                         });
                                     }
+                                });
+                            } else {
+                                res.status(201).json({
+                                    msg: "Reference No Not found",
+                                    code: 109
                                 });
                             }
                         }
