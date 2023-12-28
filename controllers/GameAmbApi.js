@@ -472,8 +472,8 @@ exports.UpdateBalanceGaming = async (req, res) => {
                             });
                         } else {
                             balanceNow = balanceUser - balanceamount;
-                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}'
-                        WHERE phonenumber ='${username}'`;
+                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
+                            actiongamenow = 'DEBIT' WHERE phonenumber ='${username}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
                                 else {
@@ -508,8 +508,8 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                 };
                                 let repost = repostGame.uploadLogRepostGame(post);
                                 balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, results[0].bet_latest)
-                                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', turnover='${balanceturnover}'
-                            WHERE phonenumber ='${username}'`;
+                                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', 
+                                turnover='${balanceturnover}',actiongamenow = 'CREDIT' WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
@@ -548,36 +548,48 @@ exports.RollbackGaming = async (req, res) => {
     const amount = req.body.amount;
     const username = req.body.playerId;
     const txnId = req.body.txnId;
-    let spl = `SELECT credit, bet_latest, idplaygame FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, idplaygame, actiongamenow FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                if (results[0].idplaygame !== txnId) {
-                    const balanceUser = parseFloat(results[0].credit);
-                    const balanceamount = parseFloat(amount);
-                    const balanceNow = balanceUser + balanceamount;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}', idplaygame = '${txnId}'
-                    WHERE phonenumber ='${username}'`;
+                if (results[0].actiongamenow !== 'CREDIT'){
+                    if (results[0].idplaygame !== txnId) {
+                        const balanceUser = parseFloat(results[0].credit);
+                        const balanceamount = parseFloat(amount);
+                        const balanceNow = balanceUser + balanceamount;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}', idplaygame = '${txnId}'
+                        WHERE phonenumber ='${username}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    extTxnId: txnId,
+                                    currency: "THB",
+                                    balance: balanceNow
+                                });
+                            }
+                        });
+                    } else {
+                        const balanceUser = parseFloat(results[0].credit);
+                        res.status(201).json({
+                            extTxnId: txnId,
+                            currency: "THB",
+                            balance: balanceUser
+                        });
+                    }
+                } else {
+                    const sql_update = `UPDATE member set actiongamenow = 'CanelFail' WHERE phonenumber ='${username}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         if (error) { console.log(error) }
                         else {
                             res.status(201).json({
-                                extTxnId: txnId,
-                                currency: "THB",
-                                balance: balanceNow
+                                code: 404,
+                                message: "player/transaction not found",
                             });
                         }
                     });
-                } else {
-                    const balanceUser = parseFloat(results[0].credit);
-                    res.status(201).json({
-                        extTxnId: txnId,
-                        currency: "THB",
-                        balance: balanceUser
-                    });
                 }
-
             }
         })
     } catch (err) {
