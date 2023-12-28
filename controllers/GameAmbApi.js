@@ -577,7 +577,7 @@ exports.RollbackGaming = async (req, res) => {
                         if (results[0].idplaygame !== txnId) {
                             const balanceUser = parseFloat(results[0].credit);
                             const balanceamount = parseFloat(amount);
-                            const balanceNow = balanceUser + balanceamount;
+                            const balanceNow = balanceUser + results[0].bet_latest;
 
                             if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                                 numberCancek = '2';
