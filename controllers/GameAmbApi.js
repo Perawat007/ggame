@@ -54,7 +54,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
     const referenceId = req.body.referenceId;
     const userAgent = req.headers['user-agent'];
     let merchantTxId = transferId
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -77,13 +77,24 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                     let balanceNow;
                     let balanceturnover = results[0].turnover;
                     if (type === 1) {
-                        balanceNow = balanceUser - amount;
-                        merchantTxId = transferId;
-                        const post = {
-                            username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
+                        if (results[0].roundId === serialNo) {
+                            
+                            const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    balanceNow = balanceUser - amount;
+                                }
+                            });
+                        } else {
+                            balanceNow = balanceUser - amount;
+                            merchantTxId = transferId;
+                            const post = {
+                                username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
+                            }
+                            let repost = repostGame.uploadLogRepostGameAsk(post)
+                            balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
                         }
-                        let repost = repostGame.uploadLogRepostGameAsk(post)
-                        balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
                     } else if (type === 2) {
                         balanceNow = balanceUser + amount;
                         merchantTxId = referenceId;
