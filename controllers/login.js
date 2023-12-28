@@ -919,7 +919,7 @@ exports.CancelBetAsk = async (req, res) => {
         const balanceUser = parseFloat(results[0].credit);
         if (results[0].bet_latest > 0) {
           let balanceNow = balanceUser + amount
-          const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest = '${0.00}', turnover='${balanceturnover}',roundId = '${trans_id}',
+          const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest = '${0.00}',roundId = '${trans_id}',
           idplaygame = '${trans_id}', actiongamenow ='settleBet' WHERE phonenumber ='${account}'`;
 
           connection.query(sql_update, (error, resultsGame) => {
