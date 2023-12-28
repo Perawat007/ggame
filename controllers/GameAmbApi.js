@@ -100,8 +100,13 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                             // let repost = repostGame.uploadLogRepostGameAsk(post)
                         }
                     } else if (type === 2) {
-                        balanceNow = balanceUser + amount;
-                        merchantTxId = referenceId;
+                        if (results[0].roundId === serialNo) {
+                            balanceNow = balanceUser;
+                            merchantTxId = referenceId;
+                        } else {
+                            balanceNow = balanceUser + amount;
+                            merchantTxId = referenceId;
+                        }
                     } else if (type === 4) {
                         if (results[0].roundId === serialNo) {
                             balanceNow = balanceUser;
