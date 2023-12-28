@@ -786,45 +786,51 @@ exports.PlaceBetAsk = async (req, res) => {
   const game_id = req.body.game_id;
   const amount = req.body.amount;
   const authHeader = req.body.token;
-  username = 'member001';
-  //console.log(trans_id);
-  let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
+
+  let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${account}' AND status_delete='N'`;
   try {
     connection.query(spl, (error, results) => {
       if (error) { console.log(error) }
       else {
         const balanceUser = parseFloat(results[0].credit);
-        const balanceNow = balanceUser - amount;
-        const namegame = results[0].playgameuser;
-        const userAgent = req.headers['user-agent'];
-        const isMobile = /Mobile|Android/.test(userAgent);
-        let platform = 'mobile';
-        if (isMobile) {
-          platform = 'mobile';
+        if (results[0].roundId === trans_id) {
+          res.status(201).json({
+            "status": 4,
+            "balance": balanceUser
+          });
         } else {
-          platform = 'computer pc';
-        }
-
-        const post = {
-          username: account, gameid: "ASKMEBET", bet: amount, win: amount, balance_credit: balanceNow,
-          userAgent: userAgent, platform: platform, trans_id: trans_id, namegame: namegame
-        }
-        let repost = repostGame.uploadLogRepostGameAsk(post)
-
-        let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, amount)
-
-        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
-        WHERE phonenumber ='${account}'`;
-        connection.query(sql_update, (error, resultsGame) => {
-          if (error) { console.log(error) }
-          else {
-            res.status(201).json({
-              status: 1,
-              trans_id: trans_id,
-              balance: balanceNow
-            });
+          const balanceNow = balanceUser - amount;
+          const namegame = results[0].playgameuser;
+          const userAgent = req.headers['user-agent'];
+          const isMobile = /Mobile|Android/.test(userAgent);
+          let platform = 'mobile';
+          if (isMobile) {
+            platform = 'mobile';
+          } else {
+            platform = 'computer pc';
           }
-        });
+
+          const post = {
+            username: account, gameid: "ASKMEBET", bet: amount, win: amount, balance_credit: balanceNow,
+            userAgent: userAgent, platform: platform, trans_id: trans_id, namegame: namegame
+          }
+          let repost = repostGame.uploadLogRepostGameAsk(post)
+
+          let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, amount)
+
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}', roundId = '${trans_id}'
+          WHERE phonenumber ='${account}'`;
+          connection.query(sql_update, (error, resultsGame) => {
+            if (error) { console.log(error) }
+            else {
+              res.status(201).json({
+                status: 1,
+                trans_id: trans_id,
+                balance: balanceNow
+              });
+            }
+          });
+        }
       }
     })
   } catch (err) {
