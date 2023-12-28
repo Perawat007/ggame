@@ -451,7 +451,8 @@ exports.UpdateBalanceGaming = async (req, res) => {
     const txnEventType = req.body.txnEventType
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest, roundId FROM member 
+    WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -463,20 +464,29 @@ exports.UpdateBalanceGaming = async (req, res) => {
                 let balanceturnover = results[0].turnover;
                 if (txnType === 'DEBIT') {
                     if (balanceUser > balanceamount) {
-                        balanceNow = balanceUser - balanceamount;
-                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', turnover='${balanceturnover}'
-                    WHERE phonenumber ='${username}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
-                            if (error) { console.log(error) }
-                            else {
-                                console.log(txnType, balanceNow, balanceUser, balanceamount)
-                                res.status(201).json({
-                                    extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
-                                    currency: "THB",
-                                    balance: balanceNow
-                                });
-                            }
-                        });
+                        if (results[0].roundId === txnId) {
+                            res.status(201).json({
+                                extTxnId: txnId,
+                                currency: "THB",
+                                balance: balanceUser
+                            });
+                        } else {
+                            balanceNow = balanceUser - balanceamount;
+                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}'
+                        WHERE phonenumber ='${username}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                    res.status(201).json({
+                                        extTxnId: txnId,
+                                        currency: "THB",
+                                        balance: balanceNow
+                                    });
+                                }
+                            });
+                        }
+
                     } else {
                         res.status(201).json({
                             message: "Not enough available balance",
