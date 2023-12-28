@@ -418,14 +418,31 @@ http://localhost:5000/post/gaming/login //getbalance
 exports.gamingLogin = async (req, res) => {
     const playerId = req.body.playerId;
     const username = '0990825941';
-    console.log(playerId);
-    let spl = `SELECT credit FROM member WHERE phonenumber ='${playerId}' AND status_delete='N'`;
+    let numberCancek = '1';
+    let spl = `SELECT credit, actiongamenow FROM member WHERE phonenumber ='${playerId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             const balanceNum = parseFloat(results[0].credit);
             //console.log(balanceNum);
             if (error) { console.log(error) }
             else {
+                if (results[0].actiongamenow !== '1' || results[0].actiongamenow !== '0'){
+                    numberCancek = '1.1';
+                } else{
+                    numberCancek = results[0].actiongamenow;
+                }
+                const sql_update = `UPDATE member set actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                connection.query(sql_update, (error, resultsGame) => {
+                    if (error) { console.log(error) }
+                    else {
+                        console.log(txnType, balanceNow, balanceUser, balanceamount)
+                        res.status(201).json({
+                            extTxnId: txnId,
+                            currency: "THB",
+                            balance: balanceNow
+                        });
+                    }
+                });
                 res.status(201).json({
                     currency: "THB",
                     balance: balanceNum,
