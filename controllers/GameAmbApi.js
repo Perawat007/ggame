@@ -494,27 +494,43 @@ exports.UpdateBalanceGaming = async (req, res) => {
                         });
                     }
                 } else {
-                    balanceNow = balanceUser + balanceamount;
-                    const post = {
-                        username: username, gameid: "MICRO", bet: results[0].bet_latest, win: balanceamount, balance_credit: balanceNow,
-                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnId,
-                        roundId: txnId, balancebefore: balanceUser
-                    };
-                    let repost = repostGame.uploadLogRepostGame(post);
-                    balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, results[0].bet_latest)
-                    const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', turnover='${balanceturnover}'
-                WHERE phonenumber ='${username}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            console.log(txnType, balanceNow, balanceUser, balanceamount)
-                            res.status(201).json({
-                                extTxnId: "f47e5065-412c-40d1-9e4c-f6c248919509",
-                                currency: "THB",
-                                balance: balanceNow
-                            });
+                    let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${txnId}'`;
+                    connection.query(splroundId, (error, resultsroundId) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            if (resultsroundId.length === 0) {
+                                balanceNow = balanceUser + balanceamount;
+                                const post = {
+                                    username: username, gameid: "MICRO", bet: results[0].bet_latest, win: balanceamount, balance_credit: balanceNow,
+                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: txnId,
+                                    roundId: txnId, balancebefore: balanceUser
+                                };
+                                let repost = repostGame.uploadLogRepostGame(post);
+                                balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, results[0].bet_latest)
+                                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', turnover='${balanceturnover}'
+                            WHERE phonenumber ='${username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                        res.status(201).json({
+                                            extTxnId: txnId,
+                                            currency: "THB",
+                                            balance: balanceNow
+                                        });
+                                    }
+                                });
+                            } else {
+                                res.status(201).json({
+                                    extTxnId: txnId,
+                                    currency: "THB",
+                                    balance: balanceUser
+                                });
+                            }
                         }
                     });
+                   
                 }
 
             }
