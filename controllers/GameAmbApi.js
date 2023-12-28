@@ -55,7 +55,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
     let merchantTxId = transferId;
-    let balanceNow = 0 ;
+    let balanceNow = 0;
     let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, bet_latest FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -81,14 +81,14 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         if (results[0].roundId !== serialNo) {
                             balanceNow = balanceUser - amount;
                             merchantTxId = transferId;
-                            
+
                         } else {
                             balanceNow = balanceUser;
                             merchantTxId = transferId;
-                            const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) { console.log(error) }
-                            });
+                            // const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
+                            // connection.query(sql_update, (error, resultsGame) => {
+                            //     if (error) { console.log(error) }
+                            // });
                             // const post = {
                             //     username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
                             // }
@@ -111,8 +111,8 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         balanceNow = balanceUser + amount;
                     }
 
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}' 
-                    WHERE phonenumber ='${acctId}'`;
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
+                    roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         if (error) { console.log(error) }
                         else {
