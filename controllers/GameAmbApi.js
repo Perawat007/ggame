@@ -103,15 +103,20 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         balanceNow = balanceUser + amount;
                         merchantTxId = referenceId;
                     } else if (type === 4) {
-                        balanceNow = balanceUser + amount;
-                        merchantTxId = referenceId;
-                        const post = {
-                            username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                            userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
-                            roundId: merchantTxId, balancebefore: balanceUser
-                        };
-                        let repost = repostGame.uploadLogRepostGame(post);
-                        balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
+                        if (results[0].roundId === serialNo) {
+                            balanceNow = balanceUser - amount;
+                            merchantTxId = referenceId;
+                        } else {
+                            balanceNow = balanceUser + amount;
+                            merchantTxId = referenceId;
+                            const post = {
+                                username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: transferId,
+                                roundId: merchantTxId, balancebefore: balanceUser
+                            };
+                            let repost = repostGame.uploadLogRepostGame(post);
+                            balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
+                        }
                     } else {
                         balanceNow = balanceUser + amount;
                     }
