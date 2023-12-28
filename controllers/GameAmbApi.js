@@ -204,7 +204,7 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                 serialNo: serialNo
                             });
                         } else {
-                            if (results[0].actiongamenow === 'PlaceBet') {
+                            if (results[0].actiongamenow === 'PlaceBet' || results[0].actiongamenow === 'Settle_Bet') {
                                 balanceNow = balanceUser + amount;
                                 merchantTxId = referenceId;
                                 const post = {
