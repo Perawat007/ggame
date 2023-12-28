@@ -53,8 +53,9 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
     const type = req.body.type;
     const referenceId = req.body.referenceId;
     const userAgent = req.headers['user-agent'];
+    const userAgentt = req.useragent;
     let merchantTxId = transferId
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, bet_latest FROM member WHERE phonenumber ='${acctId}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -78,7 +79,6 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                     let balanceturnover = results[0].turnover;
                     if (type === 1) {
                         if (results[0].roundId === serialNo) {
-                            
                             const sql_update = `UPDATE member set roundId='${serialNo}' WHERE phonenumber ='${acctId}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
@@ -89,22 +89,24 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         } else {
                             balanceNow = balanceUser - amount;
                             merchantTxId = transferId;
-                            const post = {
-                                username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
-                            }
-                            let repost = repostGame.uploadLogRepostGameAsk(post)
-                            balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
+                            // const post = {
+                            //     username: acctId, gameid: "SPADE", bet: amount, win: 0, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
+                            // }
+                            // let repost = repostGame.uploadLogRepostGameAsk(post)
                         }
                     } else if (type === 2) {
                         balanceNow = balanceUser + amount;
                         merchantTxId = referenceId;
                     } else if (type === 4) {
-                        const post = {
-                            username: acctId, gameid: "SPADE", bet: 0, win: amount, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
-                        }
-                        let repost = repostGame.uploadLogRepostGameAsk(post)
                         balanceNow = balanceUser + amount;
                         merchantTxId = referenceId;
+                        const post = {
+                            username: acctId, gameid: "SPADE", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                            userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: merchantTxId,
+                            roundId: merchantTxId, balancebefore: balanceUser
+                        };
+                        let repost = repostGame.uploadLogRepostGame(post);
+                        balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
                     } else {
                         balanceNow = balanceUser + amount;
                     }
