@@ -796,6 +796,7 @@ exports.PlaceBetAsk = async (req, res) => {
         if (results[0].roundId === trans_id) {
           res.status(201).json({
             "status": 4,
+            "trans_id": trans_id,
             "balance": balanceUser
           });
         } else {
