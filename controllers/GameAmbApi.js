@@ -489,14 +489,14 @@ exports.UpdateBalanceGaming = async (req, res) => {
                             }
                         } else {
                             res.status(201).json({
-                                message: "Bad request",
-                                code: 400
+                                message: "Not enough available balance",
+                                code: 402
                             });
                         }
                     } else {
                         res.status(201).json({
-                            message: "Not enough available balance",
-                            code: 402
+                            message: "Bad request",
+                            code: 400
                         });
                     }
 
