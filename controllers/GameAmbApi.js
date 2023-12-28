@@ -118,8 +118,8 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                 }
                             });
                         } else {
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', actiongamenow = 'PlaceBetFail',
-                                roundId='${serialNo}', idplaygame = '${transferId}' WHERE phonenumber ='${acctId}'`;
+                            const sql_update = `UPDATE member set actiongamenow = 'PlaceBetFail', roundId='${serialNo}', idplaygame = '${transferId}' 
+                            WHERE phonenumber ='${acctId}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
                                 else {
