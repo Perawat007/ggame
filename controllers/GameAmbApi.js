@@ -473,7 +473,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                         } else {
                             balanceNow = balanceUser - balanceamount;
                             const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
-                            actiongamenow = 'DEBIT' WHERE phonenumber ='${username}'`;
+                            actiongamenow = '1' WHERE phonenumber ='${username}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
                                 else {
@@ -494,7 +494,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                         });
                     }
                 } else {
-                    if (results[0].actiongamenow !== 'Cancel1') {
+                    if (results[0].actiongamenow !== '2') {
                         let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${txnId}'`;
                         connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
@@ -510,7 +510,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                     let repost = repostGame.uploadLogRepostGame(post);
                                     balanceturnover = hasSimilarData(results[0].gameplayturn, txnEventType, results[0].turnover, results[0].bet_latest)
                                     const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${results[0].bet_latest}', 
-                                        turnover='${balanceturnover}',actiongamenow = 'CREDIT' WHERE phonenumber ='${username}'`;
+                                        turnover='${balanceturnover}',actiongamenow = '0' WHERE phonenumber ='${username}'`;
                                     connection.query(sql_update, (error, resultsGame) => {
                                         if (error) { console.log(error) }
                                         else {
@@ -559,14 +559,22 @@ exports.RollbackGaming = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                if (results[0].actiongamenow !== 'CREDIT') {
+                if (results[0].actiongamenow !== '0') {
                     if (results[0].idplaygame !== txnId) {
                         const balanceUser = parseFloat(results[0].credit);
                         const balanceamount = parseFloat(amount);
                         const balanceNow = balanceUser + balanceamount;
-                        const numberCancek = parseInt(stringNumber) + 1;
+                        
+                        if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1'){
+                            numberCancek = '2';
+                        } else {
+                            let number = parseInt(results[0].actiongamenow) + 1
+                            let stringNumber = number.toString();
+                            numberCancek = stringNumber;
+                        }  
+                        
                         const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                        actiongamenow = '${'Cancel'+ numberCancek}' WHERE phonenumber ='${username}'`;
+                        actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
                             else {
