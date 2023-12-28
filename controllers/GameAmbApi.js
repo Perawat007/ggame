@@ -595,7 +595,8 @@ exports.RollbackGaming = async (req, res) => {
                                         res.status(201).json({
                                             extTxnId: txnId,
                                             currency: "THB",
-                                            balance: balanceNow
+                                            balance: balanceNow,
+                                            action: results[0].actiongamenow
                                         });
                                     }
                                 });
@@ -616,7 +617,8 @@ exports.RollbackGaming = async (req, res) => {
                                         res.status(201).json({
                                             extTxnId: txnId,
                                             currency: "THB",
-                                            balance: balanceNow
+                                            balance: balanceNow,
+                                            action: results[0].actiongamenow
                                         });
                                     }
                                 });
@@ -637,7 +639,8 @@ exports.RollbackGaming = async (req, res) => {
                                         res.status(201).json({
                                             extTxnId: txnId,
                                             currency: "THB",
-                                            balance: balanceNow
+                                            balance: balanceNow,
+                                            action: results[0].actiongamenow
                                         });
                                     }
                                 });
@@ -645,7 +648,8 @@ exports.RollbackGaming = async (req, res) => {
                                 res.status(201).json({
                                     extTxnId: txnId,
                                     currency: "THB",
-                                    balance: balanceUser
+                                    balance: balanceUser,
+                                    action: results[0].actiongamenow
                                 });
                             }
                         } else {
@@ -653,7 +657,8 @@ exports.RollbackGaming = async (req, res) => {
                             res.status(201).json({
                                 extTxnId: txnId,
                                 currency: "THB",
-                                balance: balanceUser
+                                balance: balanceUser,
+                                action: results[0].actiongamenow
                             });
                         }
                     } else {
