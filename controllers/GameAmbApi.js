@@ -86,12 +86,12 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                         balanceturnover = hasSimilarData(results[0].gameplayturn, "SPADE", results[0].turnover, amount)
                     } else if (type === 2) {
                         balanceNow = balanceUser + amount;
+                        merchantTxId = referenceId;
+                    } else if (type === 4) {
                         const post = {
                             username: acctId, gameid: "SPADE", bet: 0, win: amount, balance_credit: balanceNow, userAgent: userAgent, platform: userAgent, trans_id: transferId, namegame: namegame
                         }
                         let repost = repostGame.uploadLogRepostGameAsk(post)
-
-                    } else if (type === 4) {
                         balanceNow = balanceUser + amount;
                         merchantTxId = referenceId;
                     } else {
