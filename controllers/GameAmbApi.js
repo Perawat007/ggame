@@ -183,6 +183,16 @@ exports.AuthorizationSpade_Gaming = async (req, res) => {
                                         });
                                     }
                                 });
+                            } else if (results[0].actiongamenow === 'Settle_Bet') {
+                                res.status(201).json({
+                                    transferId: transferId,
+                                    merchantTxId: merchantTxId,
+                                    acctId: acctId,
+                                    balance: balanceUser,
+                                    msg: "success",
+                                    code: 0,
+                                    serialNo: serialNo
+                                });
                             } else {
                                 res.status(201).json({
                                     msg: "Reference No Not found",
