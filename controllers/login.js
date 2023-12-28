@@ -819,7 +819,7 @@ exports.PlaceBetAsk = async (req, res) => {
 
           // let balanceturnover = hasSimilarData(results[0].gameplayturn, "ASKMEBET", results[0].turnover, amount)
 
-          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}', roundId = '${trans_id}'
+          const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${trans_id}'
           WHERE phonenumber ='${account}'`;
           connection.query(sql_update, (error, resultsGame) => {
             if (error) { console.log(error) }
