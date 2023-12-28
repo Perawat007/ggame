@@ -567,7 +567,7 @@ exports.RollbackGaming = async (req, res) => {
     const amount = req.body.amount;
     const username = req.body.playerId;
     const txnId = req.body.txnId;
-    let spl = `SELECT credit, bet_latest, idplaygame, actiongamenow FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, idplaygame, actiongamenow, roundId FROM member WHERE phonenumber ='${username}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -578,7 +578,39 @@ exports.RollbackGaming = async (req, res) => {
                             const balanceUser = parseFloat(results[0].credit);
                             const balanceamount = parseFloat(amount);
                             const balanceNow = balanceUser + results[0].bet_latest;
-                            if (results[0].actiongamenow === '1' || results[0].actiongamenow === '2')  {
+                            if (results[0].actiongamenow === '1' || results[0].actiongamenow === '2') {
+                                if (results[0].roundId === txnId) {
+                                    if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
+                                        numberCancek = '2';
+                                    } else {
+                                        let number = parseInt(results[0].actiongamenow) + 1
+                                        let stringNumber = number.toString();
+                                        numberCancek = stringNumber;
+                                    }
+
+                                    const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
+                                    actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                                    connection.query(sql_update, (error, resultsGame) => {
+                                        if (error) { console.log(error) }
+                                        else {
+                                            res.status(201).json({
+                                                extTxnId: txnId,
+                                                currency: "THB",
+                                                balance: balanceNow,
+                                                action: results[0].actiongamenow
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    res.status(201).json({
+                                        extTxnId: txnId,
+                                        currency: "THB",
+                                        balance: balanceUser,
+                                        action: results[0].actiongamenow
+                                    });
+                                }
+
+                            } else if (results[0].actiongamenow === '3' || results[0].actiongamenow === '4') {
                                 if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                                     numberCancek = '2';
                                 } else {
@@ -600,29 +632,7 @@ exports.RollbackGaming = async (req, res) => {
                                         });
                                     }
                                 });
-                            } else if (results[0].actiongamenow === '3' || results[0].actiongamenow === '4')  {
-                                if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
-                                    numberCancek = '2';
-                                } else {
-                                    let number = parseInt(results[0].actiongamenow) + 1
-                                    let stringNumber = number.toString();
-                                    numberCancek = stringNumber;
-                                }
-
-                                const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                                actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
-                                connection.query(sql_update, (error, resultsGame) => {
-                                    if (error) { console.log(error) }
-                                    else {
-                                        res.status(201).json({
-                                            extTxnId: txnId,
-                                            currency: "THB",
-                                            balance: balanceNow,
-                                            action: results[0].actiongamenow
-                                        });
-                                    }
-                                });
-                            } else if (results[0].actiongamenow === '5' || results[0].actiongamenow === '6')  {
+                            } else if (results[0].actiongamenow === '5' || results[0].actiongamenow === '6') {
                                 if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                                     numberCancek = '2';
                                 } else {
