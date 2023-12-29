@@ -282,11 +282,12 @@ exports.RollbackLive = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                if (results[0].actiongamenow === '1'){
-                    if (results[0].bet_latest > 0) {
+
+                if (results[0].bet_latest > 0) {
+                    if (results[0].actiongamenow === '1') {
                         const balanceNow = balanceUser + BetAmount;
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow ='C' 
-                        WHERE phonenumber ='${usernameGame}'`;
+                            WHERE phonenumber ='${usernameGame}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
                             else {
@@ -301,7 +302,7 @@ exports.RollbackLive = async (req, res) => {
                         });
                     } else {
                         res.status(201).json({
-                            Status: 900409,
+                            Status: 900415,
                             Description: "Duplicate Transaction",
                             ResponseDateTime: RequestDateTime,
                             OldBalance: balanceUser,
@@ -311,7 +312,7 @@ exports.RollbackLive = async (req, res) => {
                     }
                 } else {
                     res.status(201).json({
-                        Status: 900415,
+                        Status: 900409,
                         Description: "Duplicate Transaction",
                         ResponseDateTime: RequestDateTime,
                         OldBalance: balanceUser,
