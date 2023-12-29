@@ -276,30 +276,42 @@ exports.RollbackLive = async (req, res) => {
     const BetAmount = req.body.BetAmount;
     const usernameGame = req.body.PlayerId;
     const BetId = req.body.BetId;
-    let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                if (results[0].bet_latest > 0) {
-                    const balanceNow = balanceUser + BetAmount;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}' WHERE phonenumber ='${usernameGame}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                Status: 200,
-                                Description: "OK",
-                                ResponseDateTime: RequestDateTime,
-                                OldBalance: balanceUser,
-                                NewBalance: balanceNow,
-                            });
-                        }
-                    });
+                if (results[0].actiongamenow === '1'){
+                    if (results[0].bet_latest > 0) {
+                        const balanceNow = balanceUser + BetAmount;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow ='C' 
+                        WHERE phonenumber ='${usernameGame}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    Status: 200,
+                                    Description: "OK",
+                                    ResponseDateTime: RequestDateTime,
+                                    OldBalance: balanceUser,
+                                    NewBalance: balanceNow,
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            Status: 900409,
+                            Description: "Duplicate Transaction",
+                            ResponseDateTime: RequestDateTime,
+                            OldBalance: balanceUser,
+                            NewBalance: balanceUser,
+                            action: BetId,
+                        });
+                    }
                 } else {
                     res.status(201).json({
-                        Status: 900409,
+                        Status: 900415,
                         Description: "Duplicate Transaction",
                         ResponseDateTime: RequestDateTime,
                         OldBalance: balanceUser,
