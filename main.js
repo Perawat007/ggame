@@ -25,7 +25,8 @@ const moment = require('moment-timezone')
 // const fs = require('fs');
 // const path = require('path');
 // const FormData = require('form-data');
-const server = app.listen(5000, () => console.log(`Listening on port... ${5000}`));
+//const server = app.listen(5000, () => console.log(`Listening on port... ${5000}`));
+const server = app.listen(5200, () => console.log(`Listening on port... ${5200}`));
 const socket = require('./socket');
 const io = socket.init(server);
 
