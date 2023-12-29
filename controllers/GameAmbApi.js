@@ -426,12 +426,12 @@ exports.gamingLogin = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 if (results[0].actiongamenow === '1') {
-                    numberCancek = results[0].actiongamenow;
+                    numberCancek = '1';
                 } else if (results[0].actiongamenow === '0') {
-                    numberCancek = results[0].actiongamenow;
+                    numberCancek = '0';
                 }
                 else {
-                    numberCancek = '1.1';
+                    numberCancek = '2';
                 }
                 const sql_update = `UPDATE member set actiongamenow = '${numberCancek}' WHERE phonenumber ='${playerId}'`;
                 connection.query(sql_update, (error, resultsGame) => {
@@ -488,21 +488,8 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                 });
                             } else {
                                 balanceNow = balanceUser - balanceamount;
-                                if (results[0].actiongamenow === '2') {
-                                    numberCancek = '1';
-                                } else if (results[0].actiongamenow === '3') {
-                                    numberCancek = '1.2';
-                                } else if (results[0].actiongamenow === '4') {
-                                    numberCancek = '1.3';
-                                } else if (results[0].actiongamenow === '5') {
-                                    numberCancek = '1.4';
-                                } else if (results[0].actiongamenow === '5') {
-                                    numberCancek = '1.5';
-                                } else {
-                                    numberCancek = '1'
-                                }
                                 const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
-                                actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
+                                actiongamenow = '0' WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
