@@ -143,6 +143,7 @@ exports.GameResultLive = async (req, res) => {
     const ExchangeRate = req.body.ExchangeRate;
     const usernameGame = req.body.PlayerId;
     const userAgent = req.headers['user-agent'];
+    const userAgentt = req.useragent;
     let spl = `SELECT credit, playgameuser, roundId, bet_latest, turnover, gameplayturn FROM member 
     WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
