@@ -139,7 +139,8 @@ exports.GameResultLive = async (req, res) => {
     const ExchangeRate = req.body.ExchangeRate;
     const usernameGame = req.body.PlayerId;
     const userAgent = req.headers['user-agent'];
-    let spl = `SELECT credit, playgameuser, roundId FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
+    let spl = `SELECT credit, playgameuser, roundId, bet_latest, turnover, gameplayturn FROM member 
+    WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -152,8 +153,8 @@ exports.GameResultLive = async (req, res) => {
                     userAgent: userAgent, platform: userAgent, trans_id: RequestDateTime, namegame: namegame
                 }
                 let repost = repostGame.uploadLogRepostGameAsk(post)
-                let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, BetAmount)
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}' WHERE phonenumber ='${usernameGame}'`;
+                let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, results[0].bet_latest)
+                const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
                 connection.query(sql_update, (error, resultsGame) => {
                     if (error) { console.log(error) }
                     else {
