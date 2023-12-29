@@ -87,30 +87,40 @@ exports.BetLive = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                const balanceNow = balanceUser - BetAmount;
-                const namegame = results[0].playgameuser;
-                let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, BetAmount)
-
-                const post = {
-                    username: usernameGame, gameid: "LIVE22", bet: BetAmount, win: 0, balance_credit: balanceNow, 
-                    userAgent: userAgent, platform: userAgent, trans_id: TranDateTime, namegame: namegame
-                }
-                let repost = repostGame.uploadLogRepostGameAsk(post)
-
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${BetAmount}', turnover='${balanceturnover}'
-                WHERE phonenumber ='${usernameGame}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            Status: 200,
-                            Description: "OK",
-                            ResponseDateTime: RequestDateTime,
-                            OldBalance: balanceUser,
-                            NewBalance: balanceNow,
-                        });
+                if (balanceUser > BetAmount){
+                    const balanceNow = balanceUser - BetAmount;
+                    const namegame = results[0].playgameuser;
+                    let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, BetAmount)
+    
+                    const post = {
+                        username: usernameGame, gameid: "LIVE22", bet: BetAmount, win: 0, balance_credit: balanceNow, 
+                        userAgent: userAgent, platform: userAgent, trans_id: TranDateTime, namegame: namegame
                     }
-                });
+                    let repost = repostGame.uploadLogRepostGameAsk(post)
+    
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${BetAmount}', turnover='${balanceturnover}'
+                    WHERE phonenumber ='${usernameGame}'`;
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) { console.log(error) }
+                        else {
+                            res.status(201).json({
+                                Status: 200,
+                                Description: "OK",
+                                ResponseDateTime: RequestDateTime,
+                                OldBalance: balanceUser,
+                                NewBalance: balanceNow,
+                            });
+                        }
+                    });
+                } else {
+                    res.status(201).json({
+                        Status: 900605,
+                        Description: "OK",
+                        ResponseDateTime: RequestDateTime,
+                        OldBalance: balanceUser,
+                        NewBalance: balanceUser,
+                    });
+                }
             }
         })
     } catch (err) {
