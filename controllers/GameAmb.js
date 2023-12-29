@@ -205,7 +205,7 @@ exports.RollbackLive = async (req, res) => {
     const RequestDateTime = req.body.RequestDateTime;
     const BetAmount = req.body.BetAmount;
     const usernameGame = req.body.PlayerId;
-
+    const BetId = req.body.BetId;
     let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
