@@ -144,6 +144,7 @@ exports.GameResultLive = async (req, res) => {
     const usernameGame = req.body.PlayerId;
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
+    const ResultType = req.body.ResultType;
     let spl = `SELECT credit, playgameuser, roundId, bet_latest, turnover, gameplayturn, actiongamenow FROM member 
     WHERE phonenumber ='${usernameGame}' AND status_delete='N'`;
     try {
@@ -153,8 +154,57 @@ exports.GameResultLive = async (req, res) => {
                 const namegame = results[0].playgameuser;
                 const balanceUser = parseFloat(results[0].credit);
                 const balanceNow = balanceUser + Payout;
-
-                if (results[0].actiongamenow === '1'){
+                if(ResultType === 0){
+                    if (results[0].actiongamenow === '1'){
+                        let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${ResultId}'`;
+                        connection.query(splroundId, (error, resultsroundId) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                if (resultsroundId.length === 0) {
+                                    const post = {
+                                        username: usernameGame, gameid: "LIVE22", bet: results[0].bet_latest, win: Payout, balance_credit: balanceNow,
+                                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: BetId,
+                                        roundId: ResultId, balancebefore: balanceUser
+                                    };
+                                    let repost = repostGame.uploadLogRepostGame(post);
+                                    let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, results[0].bet_latest)
+                                    const sql_update = `UPDATE member set credit='${balanceNow}', actiongamenow ='2' WHERE phonenumber ='${usernameGame}'`;
+                                    connection.query(sql_update, (error, resultsGame) => {
+                                        if (error) { console.log(error) }
+                                        else {
+                                            res.status(201).json({
+                                                Status: 200,
+                                                Description: "OK",
+                                                ResponseDateTime: RequestDateTime,
+                                                OldBalance: balanceUser,
+                                                NewBalance: balanceNow,
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    res.status(201).json({
+                                        Status: 900409,
+                                        Description: "Duplicate Transaction",
+                                        ResponseDateTime: RequestDateTime,
+                                        OldBalance: balanceUser,
+                                        NewBalance: balanceUser,
+                                        action: BetId,
+                                    });
+                                }
+                            }
+                        })
+                    } else {
+                        res.status(201).json({
+                            Status: 900415,
+                            Description: "Duplicate Transaction",
+                            ResponseDateTime: RequestDateTime,
+                            OldBalance: balanceUser,
+                            NewBalance: balanceUser,
+                            action: BetId,
+                        });
+                    }
+                } else {
                     let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${ResultId}'`;
                     connection.query(splroundId, (error, resultsroundId) => {
                         if (error) {
@@ -193,15 +243,6 @@ exports.GameResultLive = async (req, res) => {
                             }
                         }
                     })
-                } else {
-                    res.status(201).json({
-                        Status: 900415,
-                        Description: "Duplicate Transaction",
-                        ResponseDateTime: RequestDateTime,
-                        OldBalance: balanceUser,
-                        NewBalance: balanceUser,
-                        action: BetId,
-                    });
                 }
             }
         })
