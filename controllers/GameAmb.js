@@ -88,7 +88,8 @@ exports.BetLive = async (req, res) => {
             else {
                 const balanceUser = parseFloat(results[0].credit);
                 if (balanceUser > BetAmount) {
-                    if (results[0].roundId !== BetId) {
+                    let stringNumber = BetId.toString();
+                    if (stringNumber !== results[0].roundId) {
                         const balanceNow = balanceUser - BetAmount;
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${BetAmount}', roundId ='${BetId}'
                         WHERE phonenumber ='${usernameGame}'`;
@@ -97,21 +98,22 @@ exports.BetLive = async (req, res) => {
                             else {
                                 res.status(201).json({
                                     Status: 200,
-                                    Description: "OK",
+                                    Description: "Duplicate Transaction",
                                     ResponseDateTime: RequestDateTime,
                                     OldBalance: balanceUser,
                                     NewBalance: balanceNow,
+                                    action: BetId,
                                 });
                             }
                         });
-                    }
-                    else {
+                    } else {
                         res.status(201).json({
                             Status: 900409,
                             Description: "Duplicate Transaction",
                             ResponseDateTime: RequestDateTime,
                             OldBalance: balanceUser,
                             NewBalance: balanceUser,
+                            action: BetId,
                         });
                     }
                 } else {
