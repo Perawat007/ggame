@@ -137,6 +137,8 @@ http://localhost:5000/post/Live/GameResult
 exports.GameResultLive = async (req, res) => {
     const RequestDateTime = req.body.RequestDateTime;
     const Payout = req.body.Payout;
+    const ResultId = req.body.ResultId;
+    const BetId = req.body.BetId;
     const WinLose = req.body.WinLose;
     const ExchangeRate = req.body.ExchangeRate;
     const usernameGame = req.body.PlayerId;
@@ -150,25 +152,45 @@ exports.GameResultLive = async (req, res) => {
                 const namegame = results[0].playgameuser;
                 const balanceUser = parseFloat(results[0].credit);
                 const balanceNow = balanceUser + Payout;
-                const post = {
-                    username: usernameGame, gameid: "LIVE22", bet: 0, win: Payout, balance_credit: balanceNow,
-                    userAgent: userAgent, platform: userAgent, trans_id: RequestDateTime, namegame: namegame
-                }
-                let repost = repostGame.uploadLogRepostGameAsk(post)
-                let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, results[0].bet_latest)
-                const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            Status: 200,
-                            Description: "OK",
-                            ResponseDateTime: RequestDateTime,
-                            OldBalance: balanceUser,
-                            NewBalance: balanceNow,
-                        });
+
+                let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${ResultId}'`;
+                connection.query(splroundId, (error, resultsroundId) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        if (resultsroundId.length === 0) {
+                            const post = {
+                                username: usernameGame, gameid: "LIVE22", bet: results[0].bet_latest, win: Payout, balance_credit: balanceNow,
+                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: BetId,
+                                roundId: ResultId, balancebefore: balanceUser
+                            };
+                            let repost = repostGame.uploadLogRepostGame(post);
+                            let balanceturnover = hasSimilarData(results[0].gameplayturn, "LIVE22", results[0].turnover, results[0].bet_latest)
+                            const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernameGame}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        Status: 200,
+                                        Description: "OK",
+                                        ResponseDateTime: RequestDateTime,
+                                        OldBalance: balanceUser,
+                                        NewBalance: balanceNow,
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(201).json({
+                                Status: 900409,
+                                Description: "Duplicate Transaction",
+                                ResponseDateTime: RequestDateTime,
+                                OldBalance: balanceUser,
+                                NewBalance: balanceUser,
+                                action: BetId,
+                            });
+                        }
                     }
-                });
+                })
             }
         })
     } catch (err) {
