@@ -154,8 +154,8 @@ exports.GameResultLive = async (req, res) => {
                 const namegame = results[0].playgameuser;
                 const balanceUser = parseFloat(results[0].credit);
                 const balanceNow = balanceUser + Payout;
-                if(ResultType === 0){
-                    if (results[0].actiongamenow === '1'){
+                if (ResultType === 0) {
+                    if (results[0].actiongamenow === '1') {
                         let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${ResultId}'`;
                         connection.query(splroundId, (error, resultsroundId) => {
                             if (error) {
@@ -195,14 +195,32 @@ exports.GameResultLive = async (req, res) => {
                             }
                         })
                     } else {
-                        res.status(201).json({
-                            Status: 900415,
-                            Description: "Duplicate Transaction",
-                            ResponseDateTime: RequestDateTime,
-                            OldBalance: balanceUser,
-                            NewBalance: balanceUser,
-                            action: BetId,
-                        });
+                        let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${ResultId}'`;
+                        connection.query(splroundId, (error, resultsroundId) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                if (resultsroundId.length > 0) {
+                                    res.status(201).json({
+                                        Status: 900409,
+                                        Description: "Duplicate Transaction",
+                                        ResponseDateTime: RequestDateTime,
+                                        OldBalance: balanceUser,
+                                        NewBalance: balanceUser,
+                                        action: BetId,
+                                    });
+                                } else {
+                                    res.status(201).json({
+                                        Status: 900415,
+                                        Description: "Duplicate Transaction",
+                                        ResponseDateTime: RequestDateTime,
+                                        OldBalance: balanceUser,
+                                        NewBalance: balanceUser,
+                                        action: BetId,
+                                    });
+                                }
+                            }
+                        })
                     }
                 } else {
                     let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${ResultId}'`;
@@ -264,7 +282,7 @@ exports.RollbackLive = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                if (results[0].bet_latest > 0){
+                if (results[0].bet_latest > 0) {
                     const balanceNow = balanceUser + BetAmount;
                     const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}' WHERE phonenumber ='${usernameGame}'`;
                     connection.query(sql_update, (error, resultsGame) => {
