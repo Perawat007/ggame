@@ -173,7 +173,7 @@ exports.RollbackLive = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                const balanceNow = balanceUser - BetAmount;
+                const balanceNow = balanceUser + BetAmount;
                 const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${BetAmount}' WHERE phonenumber ='${usernameGame}'`;
                 connection.query(sql_update, (error, resultsGame) => {
                     if (error) { console.log(error) }
