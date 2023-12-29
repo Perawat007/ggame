@@ -489,7 +489,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                             } else {
                                 balanceNow = balanceUser - balanceamount;
                                 const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
-                                actiongamenow = '0' WHERE phonenumber ='${username}'`;
+                                actiongamenow = '1' WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
