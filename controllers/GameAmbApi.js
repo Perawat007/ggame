@@ -712,13 +712,16 @@ http://localhost:5000/post/eVOPLAYSeamless
 exports.EVOPLAYSeamless = async (req, res) => {
     const token = req.body.token;
     const callback_id = req.body.callback_id;
+    const round_id = req.body.round_id;
     const name = req.body.name;
     const data = req.body.data;
     //const username = '0990825941';
     const userAgent = req.headers['user-agent'];
+    const userAgentt = req.useragent;
     //console.log(token);
 
-    let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser, roundId FROM member WHERE tokenplaygame ='${token}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser, roundId, bet_latest 
+    FROM member WHERE tokenplaygame ='${token}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -737,21 +740,21 @@ exports.EVOPLAYSeamless = async (req, res) => {
                         }
                     });
                 } else if (name === 'bet') {
-                    if (results[0].roundId !== callback_id){
+                    if (results[0].roundId !== callback_id) {
                         const amount0 = data.amount
                         const amount = parseFloat(amount0);
                         const balanceNum = parseFloat(balanceUser);
                         const balanceNow = balanceNum - amount
                         const balanceString = balanceNow.toFixed(2);
-    
-                        const post = {
-                            username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
-                            userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
-                        }
-                        let repost = repostGame.uploadLogRepostGameAsk(post)
-    
-                        let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
-    
+
+                        // const post = {
+                        //     username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
+                        //     userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
+                        // }
+                        // let repost = repostGame.uploadLogRepostGameAsk(post)
+
+                        //let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
+
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
                         roundId = '${callback_id}' WHERE phonenumber ='${results[0].username}'`;
                         connection.query(sql_update, (error, resultsGame) => {
@@ -773,28 +776,50 @@ exports.EVOPLAYSeamless = async (req, res) => {
                             }
                         });
                     }
-                    
+
                 } else if (name === 'win') {
-                    const amount0 = data.amount
-                    const amount = parseFloat(amount0);
-                    const balanceNum = parseFloat(balanceUser);
-                    const balanceNow = balanceNum + amount
-                    const balanceString = balanceNow.toFixed(2);
-                    const post = {
-                        username: results[0].username, gameid: 'EVOPLAY', bet: 0, win: amount, balance_credit: balanceNow,
-                        userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
-                    }
-                    let repost = repostGame.uploadLogRepostGameAsk(post)
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        res.status(201).json({
-                            status: "ok",
-                            data: {
-                                balance: balanceString,
-                                currency: data.currency
+                    let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${round_id}'`;
+                    connection.query(splroundId, (error, resultsroundId) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            if (resultsroundId.length === 0) {
+                                const amount0 = data.amount
+                                const amount = parseFloat(amount0);
+                                const balanceNum = parseFloat(balanceUser);
+                                const balanceNow = balanceNum + amount
+                                const balanceString = balanceNow.toFixed(2);
+
+                                const post = {
+                                    username: results[0].username, gameid: "EVOPLAY", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: callback_id,
+                                    roundId: round_id, balancebefore: balanceUser
+                                };
+                                let repost = repostGame.uploadLogRepostGame(post);
+
+                                balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, results[0].bet_latest)
+
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    res.status(201).json({
+                                        status: "ok",
+                                        data: {
+                                            balance: balanceString,
+                                            currency: data.currency
+                                        }
+                                    });
+                                });
+                            } else {
+                                res.status(201).json({
+                                    status: "ok",
+                                    data: {
+                                        balance: balanceString,
+                                        currency: data.currency
+                                    }
+                                });
                             }
-                        });
-                    });
+                        }
+                    })
                 } else {
                     const amount0 = data.amount
                     const amount = parseFloat(amount0);
