@@ -796,32 +796,44 @@ exports.EVOPLAYSeamless = async (req, res) => {
                             console.log(error);
                         } else {
                             if (resultsroundId.length === 0) {
-                                const amount0 = data.amount
-                                const amount = parseFloat(amount0);
-                                const balanceNum = parseFloat(balanceUser);
-                                const balanceNow = balanceNum + amount
-                                const balanceString = balanceNow.toFixed(2);
 
-                                const post = {
-                                    username: results[0].username, gameid: "EVOPLAY", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: callback_id,
-                                    roundId: callback_id, balancebefore: balanceUser
-                                };
-                                let repost = repostGame.uploadLogRepostGame(post);
+                                if (results[0].actiongamenow !== '3') {
+                                    const amount0 = data.amount
+                                    const amount = parseFloat(amount0);
+                                    const balanceNum = parseFloat(balanceUser);
+                                    const balanceNow = balanceNum + amount
+                                    const balanceString = balanceNow.toFixed(2);
 
-                                balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, results[0].bet_latest)
+                                    const post = {
+                                        username: results[0].username, gameid: "EVOPLAY", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: callback_id,
+                                        roundId: callback_id, balancebefore: balanceUser
+                                    };
+                                    let repost = repostGame.uploadLogRepostGame(post);
 
-                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', 
-                                actiongamenow = '2' WHERE phonenumber ='${results[0].username}'`;
-                                connection.query(sql_update, (error, resultsGame) => {
+                                    balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, results[0].bet_latest)
+
+                                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', 
+                                    actiongamenow = '2' WHERE phonenumber ='${results[0].username}'`;
+                                    connection.query(sql_update, (error, resultsGame) => {
+                                        res.status(201).json({
+                                            status: "ok",
+                                            data: {
+                                                balance: balanceString,
+                                                currency: data.currency
+                                            }
+                                        });
+                                    });
+                                } else {
                                     res.status(201).json({
-                                        status: "ok",
-                                        data: {
-                                            balance: balanceString,
-                                            currency: data.currency
+                                        status: "error",
+                                        error: {
+                                            scope: "user",
+                                            no_refund: "1",
+                                            message: "Transaction already cancel"
                                         }
                                     });
-                                });
+                                }
                             } else {
                                 res.status(201).json({
                                     status: "ok",
