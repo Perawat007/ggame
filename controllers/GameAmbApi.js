@@ -715,7 +715,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
     const name = req.body.name;
     const data = req.body.data;
     //const username = '0990825941';
-    const round_id = data[0].round_id;
+    const round_id = data.round_id;
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
     //console.log(token);
