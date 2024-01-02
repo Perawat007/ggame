@@ -744,28 +744,42 @@ exports.EVOPLAYSeamless = async (req, res) => {
                     const balanceNum = parseFloat(balanceUser);
                     if (balanceNum > amount) {
                         if (results[0].roundId !== callback_id) {
-                            const balanceNow = balanceNum - amount
-                            const balanceString = balanceNow.toFixed(2);
+                            if (results[0].actiongamenow !== '3.5') {
+                                const balanceNow = balanceNum - amount
+                                const balanceString = balanceNow.toFixed(2);
 
-                            // const post = {
-                            //     username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
-                            //     userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
-                            // }
-                            // let repost = repostGame.uploadLogRepostGameAsk(post)
+                                // const post = {
+                                //     username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
+                                //     userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
+                                // }
+                                // let repost = repostGame.uploadLogRepostGameAsk(post)
 
-                            //let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
+                                //let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
 
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',roundId = '${callback_id}', 
-                            actiongamenow = '1' WHERE phonenumber ='${results[0].username}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                res.status(201).json({
-                                    status: "ok",
-                                    data: {
-                                        balance: balanceString,
-                                        currency: data.currency
-                                    }
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',roundId = '${callback_id}', 
+                                actiongamenow = '1' WHERE phonenumber ='${results[0].username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    res.status(201).json({
+                                        status: "ok",
+                                        data: {
+                                            balance: balanceString,
+                                            currency: data.currency
+                                        }
+                                    });
                                 });
-                            });
+                            } else {
+                                const sql_update = `UPDATE member set credit='${balanceNum}',bet_latest='${amount}',roundId = '${callback_id}', 
+                                actiongamenow = '1' WHERE phonenumber ='${results[0].username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    res.status(201).json({
+                                        status: "ok",
+                                        data: {
+                                            balance: balanceString,
+                                            currency: data.currency
+                                        }
+                                    });
+                                });
+                            }
                         } else {
                             res.status(201).json({
                                 status: "error",
@@ -866,12 +880,15 @@ exports.EVOPLAYSeamless = async (req, res) => {
                                     });
                                 });
                             } else {
-                                res.status(201).json({
-                                    status: "ok",
-                                    data: {
-                                        balance: balanceString,
-                                        currency: data.currency
-                                    }
+                                const sql_update = `UPDATE member set actiongamenow = '3.5' WHERE phonenumber ='${results[0].username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    res.status(201).json({
+                                        status: "ok",
+                                        data: {
+                                            balance: balanceString,
+                                            currency: data.currency
+                                        }
+                                    });
                                 });
                             }
                         } else {
