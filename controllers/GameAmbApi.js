@@ -777,13 +777,13 @@ exports.EVOPLAYSeamless = async (req, res) => {
                     }
 
                 } else if (name === 'win') {
+                    const round_id = data.round_id;
                     let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${round_id}'`;
                     connection.query(splroundId, (error, resultsroundId) => {
                         if (error) {
                             console.log(error);
                         } else {
                             if (resultsroundId.length === 0) {
-                                const round_id = data.round_id;
                                 const amount0 = data.amount
                                 const amount = parseFloat(amount0);
                                 const balanceNum = parseFloat(balanceUser);
