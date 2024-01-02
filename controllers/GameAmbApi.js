@@ -712,10 +712,10 @@ http://localhost:5000/post/eVOPLAYSeamless
 exports.EVOPLAYSeamless = async (req, res) => {
     const token = req.body.token;
     const callback_id = req.body.callback_id;
-    const round_id = req.body.round_id;
     const name = req.body.name;
     const data = req.body.data;
     //const username = '0990825941';
+    const round_id = data[0].round_id;
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
     //console.log(token);
