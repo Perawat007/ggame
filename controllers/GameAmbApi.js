@@ -821,13 +821,24 @@ exports.EVOPLAYSeamless = async (req, res) => {
                         }
                     })
                 } else {
-                    const amount0 = data.amount
-                    const amount = parseFloat(amount0);
-                    const balanceNum = parseFloat(balanceUser);
-                    const balanceNow = balanceNum + amount
-                    const balanceString = balanceNow.toFixed(2);
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
+                    if (results[0].roundId !== callback_id) {
+                        const amount0 = data.amount
+                        const amount = parseFloat(amount0);
+                        const balanceNum = parseFloat(balanceUser);
+                        const balanceNow = balanceNum + amount
+                        const balanceString = balanceNow.toFixed(2);
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${callback_id}'  
+                        WHERE phonenumber ='${results[0].username}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            res.status(201).json({
+                                status: "ok",
+                                data: {
+                                    balance: balanceString,
+                                    currency: data.currency
+                                }
+                            });
+                        });
+                    } else {
                         res.status(201).json({
                             status: "ok",
                             data: {
@@ -835,7 +846,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
                                 currency: data.currency
                             }
                         });
-                    });
+                    }
                 }
             }
         })
