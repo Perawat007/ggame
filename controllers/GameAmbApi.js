@@ -718,7 +718,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
     const userAgent = req.headers['user-agent'];
     //console.log(token);
 
-    let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser FROM member WHERE tokenplaygame ='${token}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser, roundId FROM member WHERE tokenplaygame ='${token}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -737,31 +737,43 @@ exports.EVOPLAYSeamless = async (req, res) => {
                         }
                     });
                 } else if (name === 'bet') {
-                    const amount0 = data.amount
-                    const amount = parseFloat(amount0);
-                    const balanceNum = parseFloat(balanceUser);
-                    const balanceNow = balanceNum - amount
-                    const balanceString = balanceNow.toFixed(2);
-
-                    const post = {
-                        username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
-                        userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
-                    }
-                    let repost = repostGame.uploadLogRepostGameAsk(post)
-
-                    let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
-
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
-                    WHERE phonenumber ='${results[0].username}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
+                    if (results[0].roundId !== callback_id){
+                        const amount0 = data.amount
+                        const amount = parseFloat(amount0);
+                        const balanceNum = parseFloat(balanceUser);
+                        const balanceNow = balanceNum - amount
+                        const balanceString = balanceNow.toFixed(2);
+    
+                        const post = {
+                            username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
+                            userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
+                        }
+                        let repost = repostGame.uploadLogRepostGameAsk(post)
+    
+                        let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
+    
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}',
+                        roundId = '${callback_id}' WHERE phonenumber ='${results[0].username}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            res.status(201).json({
+                                status: "ok",
+                                data: {
+                                    balance: balanceString,
+                                    currency: data.currency
+                                }
+                            });
+                        });
+                    } else {
                         res.status(201).json({
-                            status: "ok",
-                            data: {
-                                balance: balanceString,
-                                currency: data.currency
+                            status: "error",
+                            error: {
+                                scope: "user",
+                                no_refund: "1",
+                                message: "Bet Transaction Duplicate"
                             }
                         });
-                    });
+                    }
+                    
                 } else if (name === 'win') {
                     const amount0 = data.amount
                     const amount = parseFloat(amount0);
