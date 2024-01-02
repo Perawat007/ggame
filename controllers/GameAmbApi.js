@@ -725,7 +725,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
             else {
                 const namegame = results[0].playgameuser
                 const balanceUser = results[0].credit;
-                const balanceString = balanceUser.toString();
+                const balanceString = balanceUser.toFixed(2);
 
                 if (name === 'init') {
                     console.log(balanceUser);
@@ -741,7 +741,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
                     const amount = parseFloat(amount0);
                     const balanceNum = parseFloat(balanceUser);
                     const balanceNow = balanceNum - amount
-                    const balanceString = balanceNow.toString();
+                    const balanceString = balanceNow.toFixed(2);
 
                     const post = {
                         username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
@@ -767,7 +767,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
                     const amount = parseFloat(amount0);
                     const balanceNum = parseFloat(balanceUser);
                     const balanceNow = balanceNum + amount
-                    const balanceString = balanceNow.toString();
+                    const balanceString = balanceNow.toFixed(2);
                     const post = {
                         username: results[0].username, gameid: 'EVOPLAY', bet: 0, win: amount, balance_credit: balanceNow,
                         userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
@@ -788,7 +788,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
                     const amount = parseFloat(amount0);
                     const balanceNum = parseFloat(balanceUser);
                     const balanceNow = balanceNum + amount
-                    const balanceString = balanceNow.toString();
+                    const balanceString = balanceNow.toFixed(2);
                     const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         res.status(201).json({
