@@ -866,9 +866,9 @@ exports.EVOPLAYSeamless = async (req, res) => {
                                 const amount0 = data.amount
                                 const amount = parseFloat(amount0);
                                 const balanceNum = parseFloat(balanceUser);
-                                const balanceNow = balanceNum + amount
+                                const balanceNow = balanceNum + results[0].bet_latest
                                 const balanceString = balanceNow.toFixed(2);
-                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${callback_id}', 
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0}', roundId = '${callback_id}', 
                                     actiongamenow = '3' WHERE phonenumber ='${results[0].username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     res.status(201).json({
