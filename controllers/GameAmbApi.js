@@ -778,39 +778,38 @@ exports.EVOPLAYSeamless = async (req, res) => {
 
                 } else if (name === 'win') {
                     const round_id = data.round_id;
-                    let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${round_id}'`;
+                    let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${callback_id}'`;
                     connection.query(splroundId, (error, resultsroundId) => {
                         if (error) {
                             console.log(error);
                         } else {
-                            // if (resultsroundId.length === 0) {
-                               
-                            // } else {
-                            //     res.status(201).json({
-                            //         status: "ok",
-                            //         data: {
-                            //             balance: balanceString,
-                            //             currency: data.currency
-                            //         }
-                            //     });
-                            // }
-                            const amount0 = data.amount
-                            const amount = parseFloat(amount0);
-                            const balanceNum = parseFloat(balanceUser);
-                            const balanceNow = balanceNum + amount
-                            const balanceString = balanceNow.toFixed(2);
+                            if (resultsroundId.length === 0) {
+                                const amount0 = data.amount
+                                const amount = parseFloat(amount0);
+                                const balanceNum = parseFloat(balanceUser);
+                                const balanceNow = balanceNum + amount
+                                const balanceString = balanceNow.toFixed(2);
 
-                            const post = {
-                                username: results[0].username, gameid: "EVOPLAY", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: callback_id,
-                                roundId: round_id, balancebefore: balanceUser
-                            };
-                            let repost = repostGame.uploadLogRepostGame(post);
+                                const post = {
+                                    username: results[0].username, gameid: "EVOPLAY", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: callback_id,
+                                    roundId: callback_id, balancebefore: balanceUser
+                                };
+                                let repost = repostGame.uploadLogRepostGame(post);
 
-                            balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, results[0].bet_latest)
+                                balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, results[0].bet_latest)
 
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    res.status(201).json({
+                                        status: "ok",
+                                        data: {
+                                            balance: balanceString,
+                                            currency: data.currency
+                                        }
+                                    });
+                                });
+                            } else {
                                 res.status(201).json({
                                     status: "ok",
                                     data: {
@@ -818,7 +817,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
                                         currency: data.currency
                                     }
                                 });
-                            });
+                            }
                         }
                     })
                 } else {
