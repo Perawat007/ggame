@@ -719,7 +719,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
     const userAgentt = req.useragent;
     //console.log(token);
 
-    let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser, roundId, bet_latest 
+    let spl = `SELECT credit, turnover, username, gameplayturn, playgameuser, roundId, bet_latest, actiongamenow 
     FROM member WHERE tokenplaygame ='${token}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
@@ -755,8 +755,8 @@ exports.EVOPLAYSeamless = async (req, res) => {
 
                             //let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
 
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',roundId = '${callback_id}' 
-                            WHERE phonenumber ='${results[0].username}'`;
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',roundId = '${callback_id}', 
+                            actiongamenow = '1' WHERE phonenumber ='${results[0].username}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 res.status(201).json({
                                     status: "ok",
@@ -811,7 +811,8 @@ exports.EVOPLAYSeamless = async (req, res) => {
 
                                 balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, results[0].bet_latest)
 
-                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${results[0].username}'`;
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', 
+                                actiongamenow = '2' WHERE phonenumber ='${results[0].username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     res.status(201).json({
                                         status: "ok",
@@ -833,15 +834,25 @@ exports.EVOPLAYSeamless = async (req, res) => {
                         }
                     })
                 } else {
-                    if (results[0].roundId !== callback_id) {
-                        const amount0 = data.amount
-                        const amount = parseFloat(amount0);
-                        const balanceNum = parseFloat(balanceUser);
-                        const balanceNow = balanceNum + amount
-                        const balanceString = balanceNow.toFixed(2);
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${callback_id}'  
-                        WHERE phonenumber ='${results[0].username}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
+                    if (results[0].actiongamenow === '1'){
+                        if (results[0].roundId !== callback_id) {
+                            const amount0 = data.amount
+                            const amount = parseFloat(amount0);
+                            const balanceNum = parseFloat(balanceUser);
+                            const balanceNow = balanceNum + amount
+                            const balanceString = balanceNow.toFixed(2);
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${callback_id}', 
+                            actiongamenow = '3' WHERE phonenumber ='${results[0].username}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                res.status(201).json({
+                                    status: "ok",
+                                    data: {
+                                        balance: balanceString,
+                                        currency: data.currency
+                                    }
+                                });
+                            });
+                        } else {
                             res.status(201).json({
                                 status: "ok",
                                 data: {
@@ -849,13 +860,14 @@ exports.EVOPLAYSeamless = async (req, res) => {
                                     currency: data.currency
                                 }
                             });
-                        });
+                        }
                     } else {
                         res.status(201).json({
-                            status: "ok",
-                            data: {
-                                balance: balanceString,
-                                currency: data.currency
+                            status: "error",
+                            error: {
+                                scope: "user",
+                                no_refund: "1",
+                                message: "Transaction already settle"
                             }
                         });
                     }
