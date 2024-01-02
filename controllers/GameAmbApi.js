@@ -739,39 +739,51 @@ exports.EVOPLAYSeamless = async (req, res) => {
                         }
                     });
                 } else if (name === 'bet') {
-                    if (results[0].roundId !== callback_id) {
-                        const amount0 = data.amount
-                        const amount = parseFloat(amount0);
-                        const balanceNum = parseFloat(balanceUser);
-                        const balanceNow = balanceNum - amount
-                        const balanceString = balanceNow.toFixed(2);
+                    const amount0 = data.amount
+                    const amount = parseFloat(amount0);
+                    const balanceNum = parseFloat(balanceUser);
+                    if (balanceNum > amount) {
+                        if (results[0].roundId !== callback_id) {
+                            const balanceNow = balanceNum - amount
+                            const balanceString = balanceNow.toFixed(2);
 
-                        // const post = {
-                        //     username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
-                        //     userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
-                        // }
-                        // let repost = repostGame.uploadLogRepostGameAsk(post)
+                            // const post = {
+                            //     username: results[0].username, gameid: 'EVOPLAY', bet: amount, win: 0, balance_credit: balanceNow,
+                            //     userAgent: userAgent, platform: userAgent, trans_id: data.action_id, namegame: namegame
+                            // }
+                            // let repost = repostGame.uploadLogRepostGameAsk(post)
 
-                        //let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
+                            //let balanceturnover = hasSimilarData(results[0].gameplayturn, 'EVOPLAY', results[0].turnover, amount)
 
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',roundId = '${callback_id}' 
-                        WHERE phonenumber ='${results[0].username}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}',roundId = '${callback_id}' 
+                            WHERE phonenumber ='${results[0].username}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                res.status(201).json({
+                                    status: "ok",
+                                    data: {
+                                        balance: balanceString,
+                                        currency: data.currency
+                                    }
+                                });
+                            });
+                        } else {
                             res.status(201).json({
-                                status: "ok",
-                                data: {
-                                    balance: balanceString,
-                                    currency: data.currency
+                                status: "error",
+                                error: {
+                                    scope: "user",
+                                    no_refund: "1",
+                                    message: "Bet Transaction Duplicate"
                                 }
                             });
-                        });
+                        }
+
                     } else {
                         res.status(201).json({
                             status: "error",
                             error: {
                                 scope: "user",
                                 no_refund: "1",
-                                message: "Bet Transaction Duplicate"
+                                message: "Insufficient Balance"
                             }
                         });
                     }
