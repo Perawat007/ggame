@@ -715,7 +715,6 @@ exports.EVOPLAYSeamless = async (req, res) => {
     const name = req.body.name;
     const data = req.body.data;
     //const username = '0990825941';
-    const round_id = data.round_id;
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
     //console.log(token);
@@ -784,6 +783,7 @@ exports.EVOPLAYSeamless = async (req, res) => {
                             console.log(error);
                         } else {
                             if (resultsroundId.length === 0) {
+                                const round_id = data.round_id;
                                 const amount0 = data.amount
                                 const amount = parseFloat(amount0);
                                 const balanceNum = parseFloat(balanceUser);

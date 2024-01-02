@@ -1366,9 +1366,9 @@ function getItem(key) {
 
 app.post('/testToken', async (req, res) => {
     const quantity = req.body.quantity;
-    const phonenumber = req.body.phonenumber;
+    const phonenumber = req.body.data;
 
-    console.log(phonenumber, quantity);
+    console.log(phonenumber.round_id);
 })
 
 
