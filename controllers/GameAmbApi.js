@@ -1191,7 +1191,7 @@ exports.PayoutYggdrasil = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundId}'`;
+                let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${betId}'`;
                 connection.query(splroundId, (error, resultsroundId) => {
                     if (error) {
                         console.log(error);
@@ -1203,8 +1203,8 @@ exports.PayoutYggdrasil = async (req, res) => {
 
                             const post = {
                                 username: usernames, gameid: "YGGDRASIL", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: roundId,
-                                roundId: roundId, balancebefore: balanceUser
+                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: betId,
+                                roundId: betId, balancebefore: balanceUser
                             };
                             let repost = repostGame.uploadLogRepostGame(post);
 
