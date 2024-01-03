@@ -1201,7 +1201,7 @@ exports.PayoutYggdrasil = async (req, res) => {
                     } else {
                         if (resultsroundId.length === 0) {
                             if (results[0].bet_latest > 0.00) {
-                                if (results[0].actiongamenow === '1') {
+                                if (results[0].actiongamenow !== '3') {
                                     const balanceNow = balanceUser + amount;
                                     const namegame = results[0].playgameuser
 
