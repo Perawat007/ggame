@@ -605,19 +605,18 @@ exports.RollbackGaming = async (req, res) => {
                                     numberCancek = stringNumber;
                                 }
                                 const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                                actiongamenow = '3.5' WHERE phonenumber ='${username}'`;
+                                actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
                                         res.status(201).json({
                                             extTxnId: txnId,
                                             currency: "THB",
-                                            balance: balanceUser,
-                                            action: "000" +results[0].actiongamenow
+                                            balance: balanceNow,
+                                            action: results[0].actiongamenow
                                         });
                                     }
                                 });
-                               
                             } else if (results[0].actiongamenow === '3' || results[0].actiongamenow === '4') {
                                 if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
                                     numberCancek = '2';
