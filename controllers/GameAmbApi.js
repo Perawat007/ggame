@@ -1456,7 +1456,7 @@ exports.AmebaGame = async (req, res) => {
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
 
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${account_name}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest FROM member WHERE phonenumber ='${account_name}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -1527,7 +1527,7 @@ exports.AmebaGame = async (req, res) => {
                         };
                         let repost = repostGame.uploadLogRepostGame(post);
 
-                        let balanceturnover = hasSimilarData(results[0].gameplayturn, 'YGGDRASIL', results[0].turnover, results[0].bet_latest)
+                        let balanceturnover = hasSimilarData(results[0].gameplayturn, 'AMEBA', results[0].turnover, results[0].bet_latest)
 
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover ='${balanceturnover}'
                         WHERE phonenumber ='${account_name}'`;
