@@ -429,7 +429,7 @@ exports.gamingLogin = async (req, res) => {
                     numberCancek = '1';
                 } else if (results[0].actiongamenow === '0') {
                     numberCancek = '0';
-                }else if (results[0].actiongamenow === '1.3') {
+                } else if (results[0].actiongamenow === '1.3') {
                     numberCancek = '1.3';
                 }else {
                     numberCancek = '2';
