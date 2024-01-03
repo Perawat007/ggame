@@ -1259,13 +1259,13 @@ exports.PayoutYggdrasil = async (req, res) => {
                         } else {
                             if (amount >= 0) {
                                 res.status(201).json({
-                                    code: 5001,
-                                    msg: "Request parameter error"
+                                    code: 5043,
+                                    msg: "Bet data existed"
                                 });
                             } else {
                                 res.status(201).json({
-                                    code: 5043,
-                                    msg: "Bet data existed"
+                                    code: 5001,
+                                    msg: "Request parameter error"
                                 });
                             }
                         }
