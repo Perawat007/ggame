@@ -522,7 +522,7 @@ exports.DepositManna = async (req, res) => {
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
 
-    let spl = `SELECT credit, playgameuser, bet_latest FROM member WHERE username ='${account}' AND status_delete='N' 
+    let spl = `SELECT credit, playgameuser, bet_latest, gameplayturn, turnover FROM member WHERE username ='${account}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
         connection.query(spl, (error, results) => {
