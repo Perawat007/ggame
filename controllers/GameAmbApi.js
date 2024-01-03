@@ -1132,7 +1132,8 @@ exports.PlaceBetYggdrasil = async (req, res) => {
     const gameId = req.body.gameId;
     const betId = req.body.betId;
     const roundId = req.body.roundId;
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId, actiongamenow 
+    FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -1141,7 +1142,7 @@ exports.PlaceBetYggdrasil = async (req, res) => {
                 if (balanceUser > amount) {
                     if (results[0].roundId !== betId) {
                         const balanceNow = balanceUser - amount;
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}' 
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}', actiongamenow = '1' 
                         WHERE phonenumber ='${usernames}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
@@ -1186,7 +1187,8 @@ exports.PayoutYggdrasil = async (req, res) => {
     const roundId = req.body.roundId;
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
-    let spl = `SELECT credit, turnover, playgameuser, gameplayturn, bet_latest FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, playgameuser, gameplayturn, bet_latest, actiongamenow FROM member 
+    WHERE phonenumber ='${usernames}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -1211,7 +1213,8 @@ exports.PayoutYggdrasil = async (req, res) => {
 
                                 let balanceturnover = hasSimilarData(results[0].gameplayturn, 'YGGDRASIL', results[0].turnover, results[0].bet_latest)
 
-                                const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE phonenumber ='${usernames}'`;
+                                const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
+                                WHERE phonenumber ='${usernames}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
@@ -1256,29 +1259,37 @@ exports.CancelBetYggdrasil = async (req, res) => {
     const betId = req.body.betId;
     const roundId = req.body.roundId;
 
-    let spl = `SELECT credit, bet_latest FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
                 if (results[0].bet_latest > 0.00) {
-                    const balanceUser = parseFloat(results[0].credit);
-                    const balanceNow = balanceUser + amount;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}' WHERE phonenumber ='${usernames}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                code: 0,
-                                msg: "Success",
-                                data: {
-                                    balance: balanceNow,
-                                    currency: "THB",
-                                    country: "TH"
-                                }
-                            });
-                        }
-                    });
+                    if (results[0].actiongamenow === '1'){
+                        const balanceUser = parseFloat(results[0].credit);
+                        const balanceNow = balanceUser + amount;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow = '3'
+                        WHERE phonenumber ='${usernames}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    code: 0,
+                                    msg: "Success",
+                                    data: {
+                                        balance: balanceNow,
+                                        currency: "THB",
+                                        country: "TH"
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            code: 5043,
+                            msg: "Bet data existed"
+                        });
+                    }
                 } else {
                     res.status(201).json({
                         code: 5043,
