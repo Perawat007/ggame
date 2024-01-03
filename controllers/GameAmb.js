@@ -550,29 +550,36 @@ exports.DepositManna = async (req, res) => {
                     } else {
                         if (resultsroundId.length === 0) {
                             if (results[0].roundId === round_id) {
-                                const balanceUser = parseFloat(results[0].credit);
-                                const balanceNow = balanceUser + amount + jp_win;
-                                const namegame = results[0].playgameuser;
+                                if (amount > 0) {
+                                    const balanceUser = parseFloat(results[0].credit);
+                                    const balanceNow = balanceUser + amount + jp_win;
+                                    const namegame = results[0].playgameuser;
 
-                                let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
-                                const post = {
-                                    username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: sessionId,
-                                    roundId: round_id, balancebefore: balanceUser
-                                };
-                                let repost = repostGame.uploadLogRepostGame(post);
+                                    let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
+                                    const post = {
+                                        username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: sessionId,
+                                        roundId: round_id, balancebefore: balanceUser
+                                    };
+                                    let repost = repostGame.uploadLogRepostGame(post);
 
-                                const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
-                                WHERE username ='${account}'`;
-                                connection.query(sql_update, (error, resultsGame) => {
-                                    if (error) { console.log(error) }
-                                    else {
-                                        res.status(201).json({
-                                            transaction_id: transaction_id,
-                                            balance: balanceNow,
-                                        });
-                                    }
-                                });
+                                    const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
+                                    WHERE username ='${account}'`;
+                                    connection.query(sql_update, (error, resultsGame) => {
+                                        if (error) { console.log(error) }
+                                        else {
+                                            res.status(201).json({
+                                                transaction_id: transaction_id,
+                                                balance: balanceNow,
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    res.status(201).json({
+                                        errorCode: 10201,
+                                        message: "Warning value must not be less 0.",
+                                    });
+                                }
                             } else {
                                 res.status(201).json({
                                     errorCode: 10212,
