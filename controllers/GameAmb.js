@@ -484,8 +484,8 @@ exports.WithdrawManna = async (req, res) => {
                     if (results[0].roundId !== round_id){
                         const balanceNow = balanceUser - amount;
                         const namegame = results[0].playgameuser;
-                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${amount}', roundId ='${round_id}'
-                        WHERE username ='${account}'`;
+                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${amount}', roundId ='${round_id}',
+                        actiongamenow = '1' WHERE username ='${account}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
                             else {
@@ -554,7 +554,8 @@ exports.DepositManna = async (req, res) => {
                             };
                             let repost = repostGame.uploadLogRepostGame(post);
             
-                            const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE username ='${account}'`;
+                            const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
+                            WHERE username ='${account}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
                                 else {
@@ -590,26 +591,34 @@ exports.RollbackManna = async (req, res) => {
     const transaction_id = req.body.transaction_id;
     const sessionId = req.body.sessionId;
     const currency = req.body.currency;
-    let spl = `SELECT credit, bet_latest FROM member WHERE username ='${account}' AND status_delete='N' 
+    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE username ='${account}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
                 if (results[0].bet_latest !== 0.00){
-                    const balanceUser = parseFloat(results[0].credit);
-                    const balanceNow = balanceUser + results[0].bet_latest;
-    
-                    const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${0.00}' WHERE username ='${account}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                transaction_id: transaction_id,
-                                balance: balanceNow,
-                            });
-                        }
-                    });
+                    if (results[0].actiongamenow === '1'){
+                        const balanceUser = parseFloat(results[0].credit);
+                        const balanceNow = balanceUser + results[0].bet_latest;
+        
+                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${0.00}', actiongamenow = '3' 
+                        WHERE username ='${account}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    transaction_id: transaction_id,
+                                    balance: balanceNow,
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            errorCode: 10210,
+                            message: "Target transaction id not found!",
+                        });
+                    }
                 } else {
                     res.status(201).json({
                         errorCode: 10208,
@@ -654,7 +663,7 @@ exports.JP_DepositManna = async (req, res) => {
                     };
                     let repost = repostGame.uploadLogRepostGame(post);
 
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest ='${0}', roundId ='${round_id}' 
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest ='${0.01}', roundId ='${round_id}', actiongamenow = '4' 
                     WHERE username ='${account}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         if (error) { console.log(error) }
