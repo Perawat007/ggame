@@ -604,35 +604,19 @@ exports.RollbackGaming = async (req, res) => {
                                     let stringNumber = number.toString();
                                     numberCancek = stringNumber;
                                 }
-                                if (results[0].roundId === txnId){
-                                    const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                                    actiongamenow = '${numberCancek}' WHERE phonenumber ='${username}'`;
-                                    connection.query(sql_update, (error, resultsGame) => {
-                                        if (error) { console.log(error) }
-                                        else {
-                                            res.status(201).json({
-                                                extTxnId: txnId,
-                                                currency: "THB",
-                                                balance: balanceNow,
-                                                action: "111" +results[0].actiongamenow
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
-                                    actiongamenow = '3.5' WHERE phonenumber ='${username}'`;
-                                    connection.query(sql_update, (error, resultsGame) => {
-                                        if (error) { console.log(error) }
-                                        else {
-                                            res.status(201).json({
-                                                extTxnId: txnId,
-                                                currency: "THB",
-                                                balance: balanceUser,
-                                                action: "000" +results[0].actiongamenow
-                                            });
-                                        }
-                                    });
-                                }
+                                const sql_update = `UPDATE member set credit='${balanceNow}', idplaygame = '${txnId}',
+                                actiongamenow = '3.5' WHERE phonenumber ='${username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            extTxnId: txnId,
+                                            currency: "THB",
+                                            balance: balanceUser,
+                                            action: "000" +results[0].actiongamenow
+                                        });
+                                    }
+                                });
                                
                             } else if (results[0].actiongamenow === '3' || results[0].actiongamenow === '4') {
                                 if (results[0].actiongamenow === '0' || results[0].actiongamenow === '1') {
