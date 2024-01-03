@@ -530,8 +530,8 @@ exports.DepositManna = async (req, res) => {
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
 
-    let spl = `SELECT credit, playgameuser, bet_latest, gameplayturn, turnover FROM member WHERE username ='${account}' AND status_delete='N' 
-  ORDER BY member_code ASC`;
+    let spl = `SELECT credit, playgameuser, bet_latest, gameplayturn, turnover, actiongamenow, roundId 
+    FROM member WHERE username ='${account}' AND status_delete='N' ORDER BY member_code ASC`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -542,29 +542,36 @@ exports.DepositManna = async (req, res) => {
                         console.log(error);
                     } else {
                         if (resultsroundId.length === 0) {
-                            const balanceUser = parseFloat(results[0].credit);
-                            const balanceNow = balanceUser + amount + jp_win;
-                            const namegame = results[0].playgameuser;
-            
-                            let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
-                            const post = {
-                                username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: sessionId,
-                                roundId: round_id, balancebefore: balanceUser
-                            };
-                            let repost = repostGame.uploadLogRepostGame(post);
-            
-                            const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
-                            WHERE username ='${account}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) { console.log(error) }
-                                else {
-                                    res.status(201).json({
-                                        transaction_id: transaction_id,
-                                        balance: balanceNow,
-                                    });
-                                }
-                            });
+                            if (results[0].roundId === round_id){
+                                const balanceUser = parseFloat(results[0].credit);
+                                const balanceNow = balanceUser + amount + jp_win;
+                                const namegame = results[0].playgameuser;
+                
+                                let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
+                                const post = {
+                                    username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: sessionId,
+                                    roundId: round_id, balancebefore: balanceUser
+                                };
+                                let repost = repostGame.uploadLogRepostGame(post);
+                
+                                const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
+                                WHERE username ='${account}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            transaction_id: transaction_id,
+                                            balance: balanceNow,
+                                        });
+                                    }
+                                });
+                            } else {
+                                res.status(201).json({
+                                    errorCode: 10212,
+                                    message: "Round was not found!",
+                                });
+                            }
                         } else {
                             res.status(201).json({
                                 errorCode: 10208,
