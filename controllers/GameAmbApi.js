@@ -1110,6 +1110,7 @@ exports.PlayerinfoYggdrasil = async (req, res) => {
                 const balanceUser = parseFloat(results[0].credit);
                 res.status(201).json({
                     code: 0,
+                    msg: "Success",
                     data: {
                         balance: balanceUser,
                         currency: "THB",
@@ -1154,6 +1155,7 @@ exports.PlaceBetYggdrasil = async (req, res) => {
                     else {
                         res.status(201).json({
                             code: 0,
+                            msg: "Success",
                             data: {
                                 balance: balanceNow,
                                 currency: "THB",
@@ -1198,6 +1200,7 @@ exports.PayoutYggdrasil = async (req, res) => {
                     else {
                         res.status(201).json({
                             code: 0,
+                            msg: "Success",
                             data: {
                                 balance: balanceNow,
                                 currency: "THB",
@@ -1235,6 +1238,7 @@ exports.CancelBetYggdrasil = async (req, res) => {
                     else {
                         res.status(201).json({
                             code: 0,
+                            msg: "Success",
                             data: {
                                 balance: balanceNow,
                                 currency: "THB",
