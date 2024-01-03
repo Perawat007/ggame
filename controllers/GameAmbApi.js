@@ -1141,23 +1141,30 @@ exports.PlaceBetYggdrasil = async (req, res) => {
                 const balanceUser = parseFloat(results[0].credit);
                 if (balanceUser > amount) {
                     if (results[0].roundId !== betId) {
-                        const balanceNow = balanceUser - amount;
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}', actiongamenow = '1' 
-                        WHERE phonenumber ='${usernames}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
-                            if (error) { console.log(error) }
-                            else {
-                                res.status(201).json({
-                                    code: 0,
-                                    msg: "Success",
-                                    data: {
-                                        balance: balanceNow,
-                                        currency: "THB",
-                                        country: "TH"
-                                    }
-                                });
-                            }
-                        });
+                        if (amount > 0) {
+                            const balanceNow = balanceUser - amount;
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}', actiongamenow = '1' 
+                            WHERE phonenumber ='${usernames}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        code: 0,
+                                        msg: "Success",
+                                        data: {
+                                            balance: balanceNow,
+                                            currency: "THB",
+                                            country: "TH"
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(201).json({
+                                code: 5001,
+                                msg: "Request parameter error"
+                            });
+                        }
                     } else {
                         res.status(201).json({
                             code: 5043,
@@ -1302,7 +1309,7 @@ exports.CancelBetYggdrasil = async (req, res) => {
                                     msg: "Bet data existed"
                                 });
                             }
-                        });  
+                        });
                     }
                 } else {
                     res.status(201).json({
