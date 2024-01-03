@@ -1287,18 +1287,18 @@ exports.CancelBetYggdrasil = async (req, res) => {
     const betId = req.body.betId;
     const roundId = req.body.roundId;
 
-    let spl = `SELECT credit, bet_latest, actiongamenow FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
+    let spl = `SELECT credit, bet_latest, actiongamenow, cancelgamenowid FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                if (results[0].bet_latest > 0.00) {
+                if (results[0].cancelgamenowid !== roundId) {
                     if (results[0].actiongamenow === '1') {
                         if (amount >= 0) {
                             const balanceNow = balanceUser + results[0].bet_latest;
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.01}', actiongamenow = '3'
-                            WHERE phonenumber ='${usernames}'`;
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow = '3',
+                            cancelgamenowid = '${roundId}' WHERE phonenumber ='${usernames}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
                                 else {
