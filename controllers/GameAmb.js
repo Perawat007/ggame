@@ -550,7 +550,7 @@ exports.DepositManna = async (req, res) => {
                     } else {
                         if (resultsroundId.length === 0) {
                             if (results[0].roundId === round_id) {
-                                if (amount > 0) {
+                                if (amount >= 0) {
                                     const balanceUser = parseFloat(results[0].credit);
                                     const balanceNow = balanceUser + amount + jp_win;
                                     const namegame = results[0].playgameuser;
