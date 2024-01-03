@@ -1499,9 +1499,10 @@ exports.AmebaGame = async (req, res) => {
                             }
                         });
                     } else {
+                        const balanceString = balanceNum.toFixed(2);
                         res.status(201).json({
-                            error_code: "PlayerNotFound",
-                            balance: "0",
+                            error_code: "InsufficientBalance",
+                            balance: balanceString,
                             time: time
                         });
                     }
