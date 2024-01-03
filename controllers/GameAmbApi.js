@@ -1454,6 +1454,7 @@ exports.AmebaGame = async (req, res) => {
     const account_name = req.body.account_name;
     const time = req.body.time;
     const userAgent = req.headers['user-agent'];
+    const userAgentt = req.useragent;
 
     let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${account_name}' AND status_delete='N'`;
     try {
@@ -1462,7 +1463,7 @@ exports.AmebaGame = async (req, res) => {
             else {
                 const namegame = results[0].playgameuser
                 const balanceUser = results[0].credit;
-                const balanceString = balanceUser.toString();
+                const balanceString = balanceUser.toFixed(2);;
                 if (action === 'get_balance') {
                     res.status(201).json({
                         error_code: "OK",
@@ -1479,14 +1480,14 @@ exports.AmebaGame = async (req, res) => {
                     const balanceNum = parseFloat(balanceUser);
                     if (balanceNum > amount) {
                         const balanceNow = balanceNum - amount
-                        const balanceString = balanceNow.toString();
+                        const balanceString = balanceNow.toFixed(2);
 
-                        let balanceturnover = hasSimilarData(results[0].gameplayturn, 'AMEBA', results[0].turnover, amount)
-                        const post = {
-                            username: account_name, gameid: "AMEBA", bet: amount, win: 0, balance_credit: balanceNow,
-                            userAgent: userAgent, platform: userAgent, trans_id: sessionid, namegame: namegame
-                        }
-                        let repost = repostGame.uploadLogRepostGameAsk(post)
+                        // let balanceturnover = hasSimilarData(results[0].gameplayturn, 'AMEBA', results[0].turnover, amount)
+                        // const post = {
+                        //     username: account_name, gameid: "AMEBA", bet: amount, win: 0, balance_credit: balanceNow,
+                        //     userAgent: userAgent, platform: userAgent, trans_id: sessionid, namegame: namegame
+                        // }
+                        // let repost = repostGame.uploadLogRepostGameAsk(post)
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
                         WHERE phonenumber ='${account_name}'`;
                         connection.query(sql_update, (error, resultsGame) => {
@@ -1518,12 +1519,16 @@ exports.AmebaGame = async (req, res) => {
                     const balanceNum = parseFloat(balanceUser);
                     if (balanceNum > amount) {
                         const balanceNow = balanceNum + amount
-                        const balanceString = balanceNow.toString();
+                        const balanceString = balanceNow.toFixed(2);
                         const post = {
-                            username: account_name, gameid: "AMEBA", bet: 0, win: amount, balance_credit: balanceNow,
-                            userAgent: userAgent, platform: userAgent, trans_id: sessionid, namegame: namegame
-                        }
-                        let repost = repostGame.uploadLogRepostGameAsk(post)
+                            username: account_name, gameid: "AMEBA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                            userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: "5555555555555",
+                            roundId: "555555555555", balancebefore: balanceUser
+                        };
+                        let repost = repostGame.uploadLogRepostGame(post);
+
+                        let balanceturnover = hasSimilarData(results[0].gameplayturn, 'YGGDRASIL', results[0].turnover, results[0].bet_latest)
+
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${account_name}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (balanceNow > 0) {
@@ -1552,7 +1557,7 @@ exports.AmebaGame = async (req, res) => {
                     const amount = parseFloat(bet_amt);
                     const balanceNum = parseFloat(balanceUser);
                     const balanceNow = balanceNum + amount
-                    const balanceString = balanceNow.toString();
+                    const balanceString = balanceNow.toFixed(2);
                     const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${account_name}'`;
                     connection.query(sql_update, (error, resultsGame) => {
                         res.status(201).json({
