@@ -494,31 +494,47 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
-                                        if (results[0].actiongamenow !== "1.3") {
-                                            const sql_update = `UPDATE member set actiongamenow = '1' WHERE phonenumber ='${username}'`;
-                                            connection.query(sql_update, (error, resultsGame) => {
-                                                if (error) { console.log(error) }
-                                                else {
-                                                    console.log(txnType, balanceNow, balanceUser, balanceamount)
-                                                    res.status(201).json({
-                                                        extTxnId: txnId,
-                                                        currency: "THB",
-                                                        balance: balanceNow,
-                                                        action: numberCancek + "D"
-                                                    });
-                                                }
-                                            })
+                                        if (results[0].actiongamenow !== "2.1"){
+                                            if (results[0].actiongamenow !== "1.3") {
+                                                const sql_update = `UPDATE member set actiongamenow = '1' WHERE phonenumber ='${username}'`;
+                                                connection.query(sql_update, (error, resultsGame) => {
+                                                    if (error) { console.log(error) }
+                                                    else {
+                                                        console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                                        res.status(201).json({
+                                                            extTxnId: txnId,
+                                                            currency: "THB",
+                                                            balance: balanceNow,
+                                                            action: numberCancek + "D"
+                                                        });
+                                                    }
+                                                })
+                                            } else {
+                                                const sql_update = `UPDATE member set actiongamenow = '1.3' WHERE phonenumber ='${username}'`;
+                                                connection.query(sql_update, (error, resultsGame) => {
+                                                    if (error) { console.log(error) }
+                                                    else {
+                                                        console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                                        res.status(201).json({
+                                                            extTxnId: txnId,
+                                                            currency: "THB",
+                                                            balance: balanceNow,
+                                                            action: numberCancek + "HHO"
+                                                        });
+                                                    }
+                                                })
+                                            }
                                         } else {
-                                            const sql_update = `UPDATE member set actiongamenow = '1.3' WHERE phonenumber ='${username}'`;
+                                            const sql_update = `UPDATE member set actiongamenow = '1', credit='${balanceUser}', bet_latest='${balanceamount}', 
+                                            roundId = '${txnId}' WHERE phonenumber ='${username}'`;
                                             connection.query(sql_update, (error, resultsGame) => {
                                                 if (error) { console.log(error) }
                                                 else {
-                                                    console.log(txnType, balanceNow, balanceUser, balanceamount)
                                                     res.status(201).json({
                                                         extTxnId: txnId,
                                                         currency: "THB",
-                                                        balance: balanceNow,
-                                                        action: numberCancek + "HHO"
+                                                        balance: balanceUser,
+                                                        action: numberCancek + "FFD"
                                                     });
                                                 }
                                             })
@@ -692,7 +708,7 @@ exports.RollbackGaming = async (req, res) => {
                                     }
                                 });
                             } else if (results[0].actiongamenow === '1.3') {
-                                const sql_update = `UPDATE member set idplaygame = '${txnId}', actiongamenow = '2' WHERE phonenumber ='${username}'`;
+                                const sql_update = `UPDATE member set idplaygame = '${txnId}', actiongamenow = '2.1' WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
