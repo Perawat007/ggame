@@ -1345,10 +1345,22 @@ exports.CancelBetYggdrasil = async (req, res) => {
                         });
                     }
                 } else {
-                    res.status(201).json({
-                        code: 5043,
-                        msg: "Bet data existed"
-                    });
+                    if (results[0].actiongamenow !== '1') {
+                        res.status(201).json({
+                            code: 0,
+                            msg: "Success",
+                            data: {
+                                balance: balanceUser,
+                                currency: "THB",
+                                country: "TH"
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            code: 5043,
+                            msg: "Bet data existed"
+                        });
+                    }
                 }
             }
         })
