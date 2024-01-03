@@ -1292,10 +1292,17 @@ exports.CancelBetYggdrasil = async (req, res) => {
                             }
                         });
                     } else {
-                        res.status(201).json({
-                            code: 5043,
-                            msg: "Bet data existed"
-                        });
+                        const sql_update = `UPDATE member set actiongamenow = '3'
+                        WHERE phonenumber ='${usernames}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    code: 5043,
+                                    msg: "Bet data existed"
+                                });
+                            }
+                        });  
                     }
                 } else {
                     res.status(201).json({
