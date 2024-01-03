@@ -1320,7 +1320,7 @@ exports.CancelBetYggdrasil = async (req, res) => {
                             });
                         }
                     } else {
-                        const sql_update = `UPDATE member set actiongamenow = '3'
+                        const sql_update = `UPDATE member set actiongamenow = '3', cancelgamenowid = '${roundId}'
                         WHERE phonenumber ='${usernames}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (error) { console.log(error) }
