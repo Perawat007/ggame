@@ -488,26 +488,55 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                 });
                             } else {
                                 balanceNow = balanceUser - balanceamount;
-                                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}',
-                                actiongamenow = '1' WHERE phonenumber ='${username}'`;
+                                const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${balanceamount}', roundId = '${txnId}'
+                                WHERE phonenumber ='${username}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
                                     if (error) { console.log(error) }
                                     else {
-                                        console.log(txnType, balanceNow, balanceUser, balanceamount)
-                                        res.status(201).json({
-                                            extTxnId: txnId,
-                                            currency: "THB",
-                                            balance: balanceNow,
-                                            action: numberCancek + "D"
-                                        });
+                                        if (results[0].actiongamenow !== "1.3") {
+                                            const sql_update = `UPDATE member set actiongamenow = '1.3' WHERE phonenumber ='${username}'`;
+                                            connection.query(sql_update, (error, resultsGame) => {
+                                                if (error) { console.log(error) }
+                                                else {
+                                                    console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                                    res.status(201).json({
+                                                        extTxnId: txnId,
+                                                        currency: "THB",
+                                                        balance: balanceNow,
+                                                        action: numberCancek + "D"
+                                                    });
+                                                }
+                                            })
+                                        } else {
+                                            const sql_update = `UPDATE member set actiongamenow = '1' WHERE phonenumber ='${username}'`;
+                                            connection.query(sql_update, (error, resultsGame) => {
+                                                if (error) { console.log(error) }
+                                                else {
+                                                    console.log(txnType, balanceNow, balanceUser, balanceamount)
+                                                    res.status(201).json({
+                                                        extTxnId: txnId,
+                                                        currency: "THB",
+                                                        balance: balanceNow,
+                                                        action: numberCancek + "HHO"
+                                                    });
+                                                }
+                                            })
+                                        }
                                     }
                                 });
                             }
                         } else {
-                            res.status(201).json({
-                                message: "Not enough available balance",
-                                code: 402
+                            const sql_update = `UPDATE member set actiongamenow = '1.3' WHERE phonenumber ='${username}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        message: "Not enough available balance",
+                                        code: 402
+                                    });
+                                }
                             });
+
                         }
                     } else {
                         res.status(201).json({
@@ -658,6 +687,19 @@ exports.RollbackGaming = async (req, res) => {
                                             currency: "THB",
                                             balance: balanceNow,
                                             action: results[0].actiongamenow
+                                        });
+                                    }
+                                });
+                            } else if (results[0].actiongamenow === '1.3') {
+                                const sql_update = `UPDATE member set idplaygame = '${txnId}', actiongamenow = '2' WHERE phonenumber ='${username}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            extTxnId: txnId,
+                                            currency: "THB",
+                                            balance: balanceUser,
+                                            action: results[0].actiongamenow + "5555"
                                         });
                                     }
                                 });
