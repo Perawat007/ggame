@@ -1296,7 +1296,7 @@ exports.CancelBetYggdrasil = async (req, res) => {
                     if (results[0].actiongamenow === '1') {
                         if (amount >= 0) {
                             const balanceUser = parseFloat(results[0].credit);
-                            const balanceNow = balanceUser + amount;
+                            const balanceNow = balanceUser + results[0].bet_latest;
                             const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow = '3'
                             WHERE phonenumber ='${usernames}'`;
                             connection.query(sql_update, (error, resultsGame) => {
