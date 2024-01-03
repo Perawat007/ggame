@@ -520,7 +520,7 @@ exports.DepositManna = async (req, res) => {
     const game_id = req.body.game_id;
     const userAgent = req.headers['user-agent'];
 
-    let spl = `SELECT credit, playgameuser FROM member WHERE username ='${account}' AND status_delete='N' 
+    let spl = `SELECT credit, playgameuser, bet_latest FROM member WHERE username ='${account}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
         connection.query(spl, (error, results) => {
@@ -534,7 +534,7 @@ exports.DepositManna = async (req, res) => {
                     userAgent: userAgent, platform: userAgent, trans_id: sessionId, namegame: namegame
                 }
                 let repost = repostGame.uploadLogRepostGameAsk(post)
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE username ='${account}'`;
+                const sql_update = `UPDATE member set credit='${balanceNow}' WHERE username ='${account}'`;
                 connection.query(sql_update, (error, resultsGame) => {
                     if (error) { console.log(error) }
                     else {
@@ -561,18 +561,24 @@ exports.RollbackManna = async (req, res) => {
     const transaction_id = req.body.transaction_id;
     const sessionId = req.body.sessionId;
     const currency = req.body.currency;
-    username = 'member001';
-
-    let spl = `SELECT credit FROM member WHERE username ='${account}' AND status_delete='N' 
+    let spl = `SELECT credit, bet_latest FROM member WHERE username ='${account}' AND status_delete='N' 
   ORDER BY member_code ASC`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                res.status(201).json({
-                    transaction_id: transaction_id,
-                    balance: balanceUser,
+                const balanceNow = balanceUser + results[0].bet_latest;
+
+                const sql_update = `UPDATE member set credit='${balanceNow}' WHERE username ='${account}'`;
+                connection.query(sql_update, (error, resultsGame) => {
+                    if (error) { console.log(error) }
+                    else {
+                        res.status(201).json({
+                            transaction_id: transaction_id,
+                            balance: balanceNow,
+                        });
+                    }
                 });
             }
         })
