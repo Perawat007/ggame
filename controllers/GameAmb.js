@@ -596,19 +596,26 @@ exports.RollbackManna = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                const balanceUser = parseFloat(results[0].credit);
-                const balanceNow = balanceUser + results[0].bet_latest;
-
-                const sql_update = `UPDATE member set credit='${balanceNow}' WHERE username ='${account}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            transaction_id: transaction_id,
-                            balance: balanceNow,
-                        });
-                    }
-                });
+                if (results[0].bet_latest !== 0.00){
+                    const balanceUser = parseFloat(results[0].credit);
+                    const balanceNow = balanceUser + results[0].bet_latest;
+    
+                    const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${0.00}' WHERE username ='${account}'`;
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) { console.log(error) }
+                        else {
+                            res.status(201).json({
+                                transaction_id: transaction_id,
+                                balance: balanceNow,
+                            });
+                        }
+                    });
+                } else {
+                    res.status(201).json({
+                        errorCode: 10208,
+                        message: "Transaction id exists!",
+                    });
+                }
             }
         })
     } catch (err) {
