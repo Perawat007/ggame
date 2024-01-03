@@ -1531,8 +1531,8 @@ exports.AmebaGame = async (req, res) => {
                                     const balanceString = balanceNow.toFixed(2);
                                     const post = {
                                         username: account_name, gameid: "AMEBA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: "5555555555555",
-                                        roundId: "555555555555", balancebefore: balanceUser
+                                        userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: round_id,
+                                        roundId: round_id, balancebefore: balanceUser
                                     };
                                     let repost = repostGame.uploadLogRepostGame(post);
             
@@ -1559,7 +1559,7 @@ exports.AmebaGame = async (req, res) => {
                             } else {
                                 res.status(201).json({
                                     error_code: "AlreadyProcessed",
-                                    balance: "0",
+                                    balance: balanceString,
                                     time: time
                                 });
                             }
