@@ -24,6 +24,9 @@ function convertToTwoDecimalPlaces(number) {
     }
     return number; // คืนค่าเดิมถ้าไม่เข้าเงื่อนไข
 }
+function truncateToSingleDecimalPlace(number) {
+    return Math.floor(number * 10) / 10;
+}
 
 function hasSimilarData(gameplayturn, input, turnover, betPlay) {
     if (gameplayturn !== "PlayAllGame") {
@@ -245,7 +248,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                         username: usernameGame,
                                         currency: currency,
                                         timestampMillis: timestampMillis,
-                                        balanceAfter: convertToTwoDecimalPlaces(balanceNow),
+                                        balanceAfter: truncateToSingleDecimalPlace(balanceNow),
                                         balanceBefore: balanceUser,
                                         id: id,
                                         statusCode: 0,
@@ -280,7 +283,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                         currency: currency,
                                         username: usernameGame,
                                         balanceBefore: balanceUser,
-                                        balanceAfter: convertToTwoDecimalPlaces(balanceNow),
+                                        balanceAfter: truncateToSingleDecimalPlace(balanceNow),
                                         action: "GamePlaceBets_ON",
                                     });
                                 }
@@ -322,7 +325,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                             currency: currency,
                                             username: usernameGame,
                                             balanceBefore: balanceUser,
-                                            balanceAfter:convertToTwoDecimalPlaces(balanceNow),
+                                            balanceAfter: truncateToSingleDecimalPlace(balanceNow),
                                             action: "GamePlaceBets_ON",
                                         });
                                     }
