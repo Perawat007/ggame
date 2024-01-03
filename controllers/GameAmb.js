@@ -536,28 +536,43 @@ exports.DepositManna = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                const balanceUser = parseFloat(results[0].credit);
-                const balanceNow = balanceUser + amount + jp_win;
-                const namegame = results[0].playgameuser;
-
-                let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
-                const post = {
-                    username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: sessionId,
-                    roundId: round_id, balancebefore: balanceUser
-                };
-                let repost = repostGame.uploadLogRepostGame(post);
-
-                const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE username ='${account}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            transaction_id: transaction_id,
-                            balance: balanceNow,
-                        });
+                let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${round_id}'`;
+                connection.query(splroundId, (error, resultsroundId) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        if (resultsroundId.length === 0) {
+                            const balanceUser = parseFloat(results[0].credit);
+                            const balanceNow = balanceUser + amount + jp_win;
+                            const namegame = results[0].playgameuser;
+            
+                            let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
+                            const post = {
+                                username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: sessionId,
+                                roundId: round_id, balancebefore: balanceUser
+                            };
+                            let repost = repostGame.uploadLogRepostGame(post);
+            
+                            const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE username ='${account}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        transaction_id: transaction_id,
+                                        balance: balanceNow,
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(201).json({
+                                errorCode: 10208,
+                                message: "Transaction id exists!",
+                            });
+                        }
                     }
-                });
+                })
+               
             }
         })
     } catch (err) {
