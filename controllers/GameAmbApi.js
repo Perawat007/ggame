@@ -1132,30 +1132,37 @@ exports.PlaceBetYggdrasil = async (req, res) => {
     const gameId = req.body.gameId;
     const betId = req.body.betId;
     const roundId = req.body.roundId;
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, roundId FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
                 if (balanceUser > amount){
-                    const balanceNow = balanceUser - amount;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}'
-                    WHERE phonenumber ='${usernames}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                code: 0,
-                                msg: "Success",
-                                data: {
-                                    balance: balanceNow,
-                                    currency: "THB",
-                                    country: "TH"
-                                }
-                            });
-                        }
-                    });
+                    if (results[0].roundId !== betId){
+                        const balanceNow = balanceUser - amount;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}' 
+                        WHERE phonenumber ='${usernames}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    code: 0,
+                                    msg: "Success",
+                                    data: {
+                                        balance: balanceNow,
+                                        currency: "THB",
+                                        country: "TH"
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            code: 5043,
+                            msg: "Bet data existed"
+                        });
+                    }
                 } else {
                     res.status(201).json({
                         code: 1006,
