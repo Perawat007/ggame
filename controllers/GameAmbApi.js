@@ -1142,23 +1142,43 @@ exports.PlaceBetYggdrasil = async (req, res) => {
                 if (balanceUser > amount) {
                     if (results[0].roundId !== betId) {
                         if (amount > 0) {
-                            const balanceNow = balanceUser - amount;
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}', actiongamenow = '1' 
+                            if (results[0].actiongamenow !== '3.5') {
+                                const balanceNow = balanceUser - amount;
+                                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}', actiongamenow = '1' 
+                                WHERE phonenumber ='${usernames}'`;
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            code: 0,
+                                            msg: "Success",
+                                            data: {
+                                                balance: balanceNow,
+                                                currency: "THB",
+                                                country: "TH"
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                const sql_update = `UPDATE member set credit='${balanceUser}',bet_latest='${amount}', roundId = '${betId}', actiongamenow = '1' 
                             WHERE phonenumber ='${usernames}'`;
-                            connection.query(sql_update, (error, resultsGame) => {
-                                if (error) { console.log(error) }
-                                else {
-                                    res.status(201).json({
-                                        code: 0,
-                                        msg: "Success",
-                                        data: {
-                                            balance: balanceNow,
-                                            currency: "THB",
-                                            country: "TH"
-                                        }
-                                    });
-                                }
-                            });
+                                connection.query(sql_update, (error, resultsGame) => {
+                                    if (error) { console.log(error) }
+                                    else {
+                                        res.status(201).json({
+                                            code: 0,
+                                            msg: "Success",
+                                            data: {
+                                                balance: balanceUser,
+                                                currency: "THB",
+                                                country: "TH"
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+
                         } else {
                             res.status(201).json({
                                 code: 5001,
@@ -1320,17 +1340,24 @@ exports.CancelBetYggdrasil = async (req, res) => {
                             });
                         }
                     } else {
-                        const sql_update = `UPDATE member set actiongamenow = '3', cancelgamenowid = '${roundId}'
-                        WHERE phonenumber ='${usernames}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
-                            if (error) { console.log(error) }
-                            else {
-                                if (results[0].actiongamenow === '2') {
+                        if (results[0].actiongamenow === '2') {
+                            const sql_update = `UPDATE member set actiongamenow = '3', cancelgamenowid = '${roundId}'
+                            WHERE phonenumber ='${usernames}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
                                     res.status(201).json({
                                         code: 5043,
                                         msg: "Bet data existed"
                                     });
-                                } else {
+                                }
+                            });
+                        } else {
+                            const sql_update = `UPDATE member set actiongamenow = '3.5', cancelgamenowid = '${roundId}'
+                            WHERE phonenumber ='${usernames}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
                                     res.status(201).json({
                                         code: 0,
                                         msg: "Success",
@@ -1341,8 +1368,8 @@ exports.CancelBetYggdrasil = async (req, res) => {
                                         }
                                     });
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 } else {
                     res.status(201).json({
