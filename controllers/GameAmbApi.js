@@ -1209,7 +1209,7 @@ exports.PayoutYggdrasil = async (req, res) => {
                         if (resultsroundId.length === 0) {
                             if (results[0].bet_latest > 0.00) {
                                 if (results[0].actiongamenow !== '3') {
-                                    if (amount > 0) {
+                                    if (amount >= 0) {
                                         const balanceNow = balanceUser + amount;
                                         const namegame = results[0].playgameuser
     
