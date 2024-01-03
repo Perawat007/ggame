@@ -1488,8 +1488,7 @@ exports.AmebaGame = async (req, res) => {
                         //     userAgent: userAgent, platform: userAgent, trans_id: sessionid, namegame: namegame
                         // }
                         // let repost = repostGame.uploadLogRepostGameAsk(post)
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
-                        WHERE phonenumber ='${account_name}'`;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${account_name}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (balanceNow > 0) {
                                 res.status(201).json({
@@ -1529,7 +1528,8 @@ exports.AmebaGame = async (req, res) => {
 
                         let balanceturnover = hasSimilarData(results[0].gameplayturn, 'YGGDRASIL', results[0].turnover, results[0].bet_latest)
 
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${account_name}'`;
+                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover ='${balanceturnover}'
+                        WHERE phonenumber ='${account_name}'`;
                         connection.query(sql_update, (error, resultsGame) => {
                             if (balanceNow > 0) {
                                 res.status(201).json({
