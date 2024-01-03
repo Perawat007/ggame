@@ -495,7 +495,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                     if (error) { console.log(error) }
                                     else {
                                         if (results[0].actiongamenow !== "1.3") {
-                                            const sql_update = `UPDATE member set actiongamenow = '1.3' WHERE phonenumber ='${username}'`;
+                                            const sql_update = `UPDATE member set actiongamenow = '1' WHERE phonenumber ='${username}'`;
                                             connection.query(sql_update, (error, resultsGame) => {
                                                 if (error) { console.log(error) }
                                                 else {
@@ -509,7 +509,7 @@ exports.UpdateBalanceGaming = async (req, res) => {
                                                 }
                                             })
                                         } else {
-                                            const sql_update = `UPDATE member set actiongamenow = '1' WHERE phonenumber ='${username}'`;
+                                            const sql_update = `UPDATE member set actiongamenow = '1.3' WHERE phonenumber ='${username}'`;
                                             connection.query(sql_update, (error, resultsGame) => {
                                                 if (error) { console.log(error) }
                                                 else {
