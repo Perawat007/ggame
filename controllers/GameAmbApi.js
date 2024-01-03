@@ -1520,7 +1520,7 @@ exports.AmebaGame = async (req, res) => {
                     const sum_payout_amt = req.body.sum_payout_amt;
                     const amount = parseFloat(sum_payout_amt);
                     const balanceNum = parseFloat(balanceUser);
-                    let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundId}'`;
+                    let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${round_id}'`;
                     connection.query(splroundId, (error, resultsroundId) => {
                         if (error) {
                             console.log(error);
