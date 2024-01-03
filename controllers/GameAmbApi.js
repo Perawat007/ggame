@@ -1297,7 +1297,7 @@ exports.CancelBetYggdrasil = async (req, res) => {
                     if (results[0].actiongamenow === '1') {
                         if (amount >= 0) {
                             const balanceNow = balanceUser + results[0].bet_latest;
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.00}', actiongamenow = '3'
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${0.01}', actiongamenow = '3'
                             WHERE phonenumber ='${usernames}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (error) { console.log(error) }
@@ -1345,22 +1345,10 @@ exports.CancelBetYggdrasil = async (req, res) => {
                         });
                     }
                 } else {
-                    if (results[0].actiongamenow !== '1') {
-                        res.status(201).json({
-                            code: 0,
-                            msg: "Success",
-                            data: {
-                                balance: balanceUser,
-                                currency: "THB",
-                                country: "TH"
-                            }
-                        });
-                    } else {
-                        res.status(201).json({
-                            code: 5043,
-                            msg: "Bet data existed"
-                        });
-                    }
+                    res.status(201).json({
+                        code: 5043,
+                        msg: "Bet data existed"
+                    });
                 }
             }
         })
