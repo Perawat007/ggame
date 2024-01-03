@@ -1138,8 +1138,8 @@ exports.PlaceBetYggdrasil = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                if (balanceUser > amount){
-                    if (results[0].roundId !== betId){
+                if (balanceUser > amount) {
+                    if (results[0].roundId !== betId) {
                         const balanceNow = balanceUser - amount;
                         const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${betId}' 
                         WHERE phonenumber ='${usernames}'`;
@@ -1186,39 +1186,53 @@ exports.PayoutYggdrasil = async (req, res) => {
     const roundId = req.body.roundId;
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
-    let spl = `SELECT credit, turnover, playgameuser, gameplayturn FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, playgameuser, gameplayturn, bet_latest FROM member WHERE phonenumber ='${usernames}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                const balanceUser = parseFloat(results[0].credit);
-                const balanceNow = balanceUser + amount;
-                const namegame = results[0].playgameuser
+                let splroundId = `SELECT roundId FROM repostgame WHERE roundId  ='${roundId}'`;
+                connection.query(splroundId, (error, resultsroundId) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        if (resultsroundId.length === 0) {
+                            const balanceUser = parseFloat(results[0].credit);
+                            const balanceNow = balanceUser + amount;
+                            const namegame = results[0].playgameuser
 
-                const post = {
-                    username: usernames, gameid: "YGGDRASIL", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
-                    userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: roundId,
-                    roundId: roundId, balancebefore: balanceUser
-                };
-                let repost = repostGame.uploadLogRepostGame(post);
+                            const post = {
+                                username: usernames, gameid: "YGGDRASIL", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
+                                userAgent: userAgent, platform: userAgentt, namegame: namegame, trans_id: roundId,
+                                roundId: roundId, balancebefore: balanceUser
+                            };
+                            let repost = repostGame.uploadLogRepostGame(post);
 
-                let balanceturnover = hasSimilarData(results[0].gameplayturn, 'YGGDRASIL', results[0].turnover, results[0].bet_latest)
+                            let balanceturnover = hasSimilarData(results[0].gameplayturn, 'YGGDRASIL', results[0].turnover, results[0].bet_latest)
 
-                const sql_update = `UPDATE member set credit='${balanceNow}' WHERE phonenumber ='${usernames}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            code: 0,
-                            msg: "Success",
-                            data: {
-                                balance: balanceNow,
-                                currency: "THB",
-                                country: "TH"
-                            }
-                        });
+                            const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}' WHERE phonenumber ='${usernames}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        code: 0,
+                                        msg: "Success",
+                                        data: {
+                                            balance: balanceNow,
+                                            currency: "THB",
+                                            country: "TH"
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(201).json({
+                                code: 5043,
+                                msg: "Bet data existed"
+                            });
+                        }
                     }
-                });
+                })
             }
         })
     } catch (err) {
