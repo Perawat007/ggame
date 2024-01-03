@@ -479,26 +479,33 @@ exports.WithdrawManna = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                const balanceNow = balanceUser - amount;
-                const namegame = results[0].playgameuser;
-                let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
-
-                const post = {
-                    username: account, gameid: "MANNA", bet: amount, win: 0, balance_credit: balanceNow,
-                    userAgent: userAgent, platform: userAgent, trans_id: sessionId, namegame: namegame
-                }
-                let repost = repostGame.uploadLogRepostGameAsk(post)
-                const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
-                WHERE username ='${account}'`;
-                connection.query(sql_update, (error, resultsGame) => {
-                    if (error) { console.log(error) }
-                    else {
-                        res.status(201).json({
-                            transaction_id: transaction_id,
-                            balance: balanceNow,
-                        });
+                if (balanceUser > amount){
+                    const balanceNow = balanceUser - amount;
+                    const namegame = results[0].playgameuser;
+                    let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
+    
+                    const post = {
+                        username: account, gameid: "MANNA", bet: amount, win: 0, balance_credit: balanceNow,
+                        userAgent: userAgent, platform: userAgent, trans_id: sessionId, namegame: namegame
                     }
-                });
+                    let repost = repostGame.uploadLogRepostGameAsk(post)
+                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', turnover='${balanceturnover}'
+                    WHERE username ='${account}'`;
+                    connection.query(sql_update, (error, resultsGame) => {
+                        if (error) { console.log(error) }
+                        else {
+                            res.status(201).json({
+                                transaction_id: transaction_id,
+                                balance: balanceNow,
+                            });
+                        }
+                    });
+                } else {
+                    res.status(201).json({
+                        errorCode: 10203,
+                        message: "Balance value error. Insufficient balance",
+                    });
+                }   
             }
         })
     } catch (err) {
