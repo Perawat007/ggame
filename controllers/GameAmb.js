@@ -482,7 +482,7 @@ exports.WithdrawManna = async (req, res) => {
                 const balanceUser = parseFloat(results[0].credit);
                 if (balanceUser > amount) {
                     if (results[0].roundId !== round_id) {
-                        if (amount < 0) {
+                        if (amount > 0) {
                             const balanceNow = balanceUser - amount;
                             const namegame = results[0].playgameuser;
                             const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${amount}', roundId ='${round_id}',
