@@ -245,7 +245,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                         username: usernameGame,
                                         currency: currency,
                                         timestampMillis: timestampMillis,
-                                        balanceAfter: balanceNow,
+                                        balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                         balanceBefore: balanceUser,
                                         id: id,
                                         statusCode: 0,
@@ -280,7 +280,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                         currency: currency,
                                         username: usernameGame,
                                         balanceBefore: balanceUser,
-                                        balanceAfter: balanceNow,
+                                        balanceAfter: convertToTwoDecimalPlaces(balanceNow),
                                         action: "GamePlaceBets_ON",
                                     });
                                 }
@@ -322,7 +322,7 @@ http: exports.GamePlaceBets = async (req, res) => {
                                             currency: currency,
                                             username: usernameGame,
                                             balanceBefore: balanceUser,
-                                            balanceAfter: balanceNow,
+                                            balanceAfter:convertToTwoDecimalPlaces(balanceNow),
                                             action: "GamePlaceBets_ON",
                                         });
                                     }
