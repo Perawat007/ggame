@@ -480,21 +480,28 @@ exports.WithdrawManna = async (req, res) => {
             if (error) { console.log(error) }
             else {
                 const balanceUser = parseFloat(results[0].credit);
-                if (balanceUser > amount){
-                    if (results[0].roundId !== round_id){
-                        const balanceNow = balanceUser - amount;
-                        const namegame = results[0].playgameuser;
-                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${amount}', roundId ='${round_id}',
-                        actiongamenow = '1' WHERE username ='${account}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
-                            if (error) { console.log(error) }
-                            else {
-                                res.status(201).json({
-                                    transaction_id: transaction_id,
-                                    balance: balanceNow,
-                                });
-                            }
-                        });
+                if (balanceUser > amount) {
+                    if (results[0].roundId !== round_id) {
+                        if (amount < 0) {
+                            const balanceNow = balanceUser - amount;
+                            const namegame = results[0].playgameuser;
+                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${amount}', roundId ='${round_id}',
+                            actiongamenow = '1' WHERE username ='${account}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (error) { console.log(error) }
+                                else {
+                                    res.status(201).json({
+                                        transaction_id: transaction_id,
+                                        balance: balanceNow,
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(201).json({
+                                errorCode: 10201,
+                                message: "Warning value must not be less 0.",
+                            });
+                        }
                     } else {
                         res.status(201).json({
                             errorCode: 10208,
@@ -506,7 +513,7 @@ exports.WithdrawManna = async (req, res) => {
                         errorCode: 10203,
                         message: "Balance value error. Insufficient balance",
                     });
-                }   
+                }
             }
         })
     } catch (err) {
@@ -542,11 +549,11 @@ exports.DepositManna = async (req, res) => {
                         console.log(error);
                     } else {
                         if (resultsroundId.length === 0) {
-                            if (results[0].roundId === round_id){
+                            if (results[0].roundId === round_id) {
                                 const balanceUser = parseFloat(results[0].credit);
                                 const balanceNow = balanceUser + amount + jp_win;
                                 const namegame = results[0].playgameuser;
-                
+
                                 let balanceturnover = hasSimilarData(results[0].gameplayturn, "MANNA", results[0].turnover, amount)
                                 const post = {
                                     username: account, gameid: "MANNA", bet: results[0].bet_latest, win: amount, balance_credit: balanceNow,
@@ -554,7 +561,7 @@ exports.DepositManna = async (req, res) => {
                                     roundId: round_id, balancebefore: balanceUser
                                 };
                                 let repost = repostGame.uploadLogRepostGame(post);
-                
+
                                 const sql_update = `UPDATE member set credit='${balanceNow}', turnover='${balanceturnover}', actiongamenow = '2' 
                                 WHERE username ='${account}'`;
                                 connection.query(sql_update, (error, resultsGame) => {
@@ -580,7 +587,7 @@ exports.DepositManna = async (req, res) => {
                         }
                     }
                 })
-               
+
             }
         })
     } catch (err) {
@@ -604,11 +611,11 @@ exports.RollbackManna = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                if (results[0].bet_latest !== 0.00){
-                    if (results[0].actiongamenow === '1'){
+                if (results[0].bet_latest !== 0.00) {
+                    if (results[0].actiongamenow === '1') {
                         const balanceUser = parseFloat(results[0].credit);
                         const balanceNow = balanceUser + results[0].bet_latest;
-        
+
                         const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${0.00}', actiongamenow = '3' 
                         WHERE username ='${account}'`;
                         connection.query(sql_update, (error, resultsGame) => {
@@ -659,7 +666,7 @@ exports.JP_DepositManna = async (req, res) => {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
             else {
-                if (results[0].roundId !== round_id){
+                if (results[0].roundId !== round_id) {
                     const balanceUser = parseFloat(results[0].credit);
                     const balanceNow = balanceUser + jp_win;
                     const namegame = results[0].playgameuser;
