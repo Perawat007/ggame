@@ -1456,7 +1456,8 @@ exports.AmebaGame = async (req, res) => {
     const userAgent = req.headers['user-agent'];
     const userAgentt = req.useragent;
 
-    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest FROM member WHERE phonenumber ='${account_name}' AND status_delete='N'`;
+    let spl = `SELECT credit, turnover, gameplayturn, playgameuser, bet_latest, roundId FROM member 
+    WHERE phonenumber ='${account_name}' AND status_delete='N'`;
     try {
         connection.query(spl, (error, results) => {
             if (error) { console.log(error) }
@@ -1479,25 +1480,27 @@ exports.AmebaGame = async (req, res) => {
                     const amount = parseFloat(bet_amt);
                     const balanceNum = parseFloat(balanceUser);
                     if (balanceNum > amount) {
-                        const balanceNow = balanceNum - amount
-                        const balanceString = balanceNow.toFixed(2);
-
-                        // let balanceturnover = hasSimilarData(results[0].gameplayturn, 'AMEBA', results[0].turnover, amount)
-                        // const post = {
-                        //     username: account_name, gameid: "AMEBA", bet: amount, win: 0, balance_credit: balanceNow,
-                        //     userAgent: userAgent, platform: userAgent, trans_id: sessionid, namegame: namegame
-                        // }
-                        // let repost = repostGame.uploadLogRepostGameAsk(post)
-                        const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${account_name}'`;
-                        connection.query(sql_update, (error, resultsGame) => {
-                            if (balanceNow > 0) {
-                                res.status(201).json({
-                                    error_code: "OK",
-                                    balance: balanceString,
-                                    time: time
-                                });
-                            }
-                        });
+                        if (results[0].roundId !== round_id){
+                            const balanceNow = balanceNum - amount
+                            const balanceString = balanceNow.toFixed(2);
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${round_id}' 
+                            WHERE phonenumber ='${account_name}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                if (balanceNow > 0) {
+                                    res.status(201).json({
+                                        error_code: "OK",
+                                        balance: balanceString,
+                                        time: time
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(201).json({
+                                error_code: "AlreadyProcessed",
+                                balance: balanceString,
+                                time: time
+                            });
+                        }
                     } else {
                         const balanceString = balanceNum.toFixed(2);
                         res.status(201).json({
