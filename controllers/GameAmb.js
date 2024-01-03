@@ -467,6 +467,7 @@ exports.WithdrawManna = async (req, res) => {
     const account = req.body.account;
     const transaction_id = req.body.transaction_id;
     const sessionId = req.body.sessionId;
+    const round_id = req.body.round_id;
     const amount = req.body.amount;
     const game_id = req.body.game_id;
     username = 'member001';
@@ -480,19 +481,26 @@ exports.WithdrawManna = async (req, res) => {
             else {
                 const balanceUser = parseFloat(results[0].credit);
                 if (balanceUser > amount){
-                    const balanceNow = balanceUser - amount;
-                    const namegame = results[0].playgameuser;
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}'
-                    WHERE username ='${account}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
-                        if (error) { console.log(error) }
-                        else {
-                            res.status(201).json({
-                                transaction_id: transaction_id,
-                                balance: balanceNow,
-                            });
-                        }
-                    });
+                    if (results[0].roundId !== round_id){
+                        const balanceNow = balanceUser - amount;
+                        const namegame = results[0].playgameuser;
+                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest='${amount}', roundId ='${round_id}'
+                        WHERE username ='${account}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            if (error) { console.log(error) }
+                            else {
+                                res.status(201).json({
+                                    transaction_id: transaction_id,
+                                    balance: balanceNow,
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(201).json({
+                            errorCode: 10208,
+                            message: "Transaction id exists!",
+                        });
+                    }
                 } else {
                     res.status(201).json({
                         errorCode: 10203,
