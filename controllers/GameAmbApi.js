@@ -1579,8 +1579,8 @@ exports.AmebaGame = async (req, res) => {
                             const balanceNum = parseFloat(balanceUser);
                             const balanceNow = balanceNum + results[0].bet_latest
                             const balanceString = balanceNow.toFixed(2);
-                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${tx_id}',  
-                            actiongamenow = '3' WHERE phonenumber ='${account_name}'`;
+                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${tx_id}'
+                            WHERE phonenumber ='${account_name}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 res.status(201).json({
                                     error_code: "OK",
