@@ -1480,10 +1480,10 @@ exports.AmebaGame = async (req, res) => {
                     const amount = parseFloat(bet_amt);
                     const balanceNum = parseFloat(balanceUser);
                     if (balanceNum > amount) {
-                        if (results[0].roundId !== round_id) {
+                        if (results[0].roundId !== tx_id) {
                             const balanceNow = balanceNum - amount
                             const balanceString = balanceNow.toFixed(2);
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${round_id}', actiongamenow = '1' 
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${tx_id}', actiongamenow = '1' 
                             WHERE phonenumber ='${account_name}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (balanceNow > 0) {
