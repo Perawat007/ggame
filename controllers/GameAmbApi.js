@@ -1567,24 +1567,32 @@ exports.AmebaGame = async (req, res) => {
                     })
                     
                 } else {
-                    const game_id = req.body.game_id;
-                    const round_id = req.body.round_id;
-                    const tx_id = req.body.tx_id;
-                    const free = req.body.game_id;
-                    const sessionid = req.body.round_id;
-                    const bet_amt = req.body.bet_amt;
-                    const amount = parseFloat(bet_amt);
-                    const balanceNum = parseFloat(balanceUser);
-                    const balanceNow = balanceNum + amount
-                    const balanceString = balanceNow.toFixed(2);
-                    const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}' WHERE phonenumber ='${account_name}'`;
-                    connection.query(sql_update, (error, resultsGame) => {
+                    if (results[0].bet_latest !== 0.00){
+                        const game_id = req.body.game_id;
+                        const round_id = req.body.round_id;
+                        const tx_id = req.body.tx_id;
+                        const free = req.body.game_id;
+                        const sessionid = req.body.round_id;
+                        const bet_amt = req.body.bet_amt;
+                        const amount = parseFloat(bet_amt);
+                        const balanceNum = parseFloat(balanceUser);
+                        const balanceNow = balanceNum + amount
+                        const balanceString = balanceNow.toFixed(2);
+                        const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}' WHERE phonenumber ='${account_name}'`;
+                        connection.query(sql_update, (error, resultsGame) => {
+                            res.status(201).json({
+                                error_code: "OK",
+                                balance: balanceString,
+                                time: time
+                            });
+                        });
+                    } else {
                         res.status(201).json({
-                            error_code: "OK",
+                            error_code: "AlreadyProcessed",
                             balance: balanceString,
                             time: time
                         });
-                    });
+                    }
                 }
             }
         })
