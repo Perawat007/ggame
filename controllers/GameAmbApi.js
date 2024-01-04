@@ -1606,7 +1606,8 @@ exports.AmebaGame = async (req, res) => {
                         } else if (results[0].actiongamenow === '1.1') {
                             const bet_amt = req.body.bet_amt;
                             const balanceNum = parseFloat(balanceUser);
-                            const balanceNow = balanceNum + bet_amt
+                            const amount = parseFloat(bet_amt);
+                            const balanceNow = balanceNum + amount
                             const balanceString = balanceNow.toFixed(2);
                             const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${tx_id}',  
                             actiongamenow = '3.1' WHERE phonenumber ='${account_name}'`;
