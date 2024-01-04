@@ -1603,7 +1603,7 @@ exports.AmebaGame = async (req, res) => {
                                     time: time
                                 });
                             });
-                        } else if (results[0].actiongamenow === '1.1') {
+                        } else if (results[0].actiongamenow === '1.1' || results[0].actiongamenow === '3.1') {
                             const bet_amt = req.body.bet_amt;
                             const balanceNum = parseFloat(balanceUser);
                             const amount = parseFloat(bet_amt);
