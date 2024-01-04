@@ -1479,12 +1479,26 @@ exports.AmebaGame = async (req, res) => {
                     const bet_amt = req.body.bet_amt;
                     const amount = parseFloat(bet_amt);
                     const balanceNum = parseFloat(balanceUser);
+                    let actionid = '1'
                     if (balanceNum > amount) {
                         if (results[0].roundId !== tx_id) {
                             const balanceNow = balanceNum - amount
                             const balanceString = balanceNow.toFixed(2);
-                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${tx_id}', actiongamenow = '1' 
-                            WHERE phonenumber ='${account_name}'`;
+                            switch (results[0].roundId) {
+                                case '1':
+                                    actionid = "1.1";
+                                    break;
+                                case '1.1':
+                                    actionid = "1.1";
+                                    break;
+                                case '3.1':
+                                    actionid = "1.3";
+                                    break;
+                                default:
+                                    actionid = "1";
+                            }
+                            const sql_update = `UPDATE member set credit='${balanceNow}',bet_latest='${amount}', roundId = '${tx_id}', 
+                            actiongamenow = '${actionid}' WHERE phonenumber ='${account_name}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 if (balanceNow > 0) {
                                     res.status(201).json({
@@ -1570,7 +1584,7 @@ exports.AmebaGame = async (req, res) => {
                     const round_id = req.body.round_id;
                     const tx_id = req.body.tx_id;
                     if (results[0].cancelgamenowid !== tx_id) {
-                        if (results[0].actiongamenow === '1'){
+                        if (results[0].actiongamenow === '1') {
                             const game_id = req.body.game_id;
                             const free = req.body.game_id;
                             const sessionid = req.body.round_id;
@@ -1581,6 +1595,20 @@ exports.AmebaGame = async (req, res) => {
                             const balanceString = balanceNow.toFixed(2);
                             const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${tx_id}',  
                             actiongamenow = '3' WHERE phonenumber ='${account_name}'`;
+                            connection.query(sql_update, (error, resultsGame) => {
+                                res.status(201).json({
+                                    error_code: "OK",
+                                    balance: balanceString,
+                                    time: time
+                                });
+                            });
+                        } else if (results[0].actiongamenow === '1.1') {
+                            const bet_amt = req.body.bet_amt;
+                            const balanceNum = parseFloat(balanceUser);
+                            const balanceNow = balanceNum + bet_amt
+                            const balanceString = balanceNow.toFixed(2);
+                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${tx_id}',  
+                            actiongamenow = '3.1' WHERE phonenumber ='${account_name}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 res.status(201).json({
                                     error_code: "OK",

@@ -102,9 +102,6 @@ module.exports = class Post {
                 default:
                     Bank = "ธนาคารไทยพาณิชย์";
             }
-
-
-
             //console.log(last4Digits, last4DigitsUser)
             //console.log(Bank, resFinance.data.receiver.account.value, resFinance.data.sender.account.value);
 
