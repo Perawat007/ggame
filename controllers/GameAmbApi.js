@@ -1568,10 +1568,10 @@ exports.AmebaGame = async (req, res) => {
 
                 } else {
                     const round_id = req.body.round_id;
-                    if (results[0].cancelgamenowid !== round_id) {
+                    const tx_id = req.body.tx_id;
+                    if (results[0].cancelgamenowid !== tx_id) {
                         if (results[0].actiongamenow === '1'){
                             const game_id = req.body.game_id;
-                            const tx_id = req.body.tx_id;
                             const free = req.body.game_id;
                             const sessionid = req.body.round_id;
                             const bet_amt = req.body.bet_amt;
@@ -1579,7 +1579,7 @@ exports.AmebaGame = async (req, res) => {
                             const balanceNum = parseFloat(balanceUser);
                             const balanceNow = balanceNum + results[0].bet_latest
                             const balanceString = balanceNow.toFixed(2);
-                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${round_id}',  
+                            const sql_update = `UPDATE member set credit='${balanceNow}', bet_latest ='${0.00}', cancelgamenowid = '${tx_id}',  
                             actiongamenow = '3' WHERE phonenumber ='${account_name}'`;
                             connection.query(sql_update, (error, resultsGame) => {
                                 res.status(201).json({
