@@ -1573,7 +1573,6 @@ exports.AmebaGame = async (req, res) => {
                     const free = req.body.game_id;
                     const sessionid = req.body.round_id;
                     const bet_amt = req.body.bet_amt;
-                    const amount0 = data.amount
                     const amount = parseFloat(bet_amt);
                     const balanceNum = parseFloat(balanceUser);
                     const balanceNow = balanceNum + amount
