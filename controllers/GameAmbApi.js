@@ -1492,7 +1492,7 @@ exports.AmebaGame = async (req, res) => {
                                     actionid = "1.1";
                                     break;
                                 case '3.1':
-                                    actionid = "1.3";
+                                    actionid = "1";
                                     break;
                                 default:
                                     actionid = "1";
