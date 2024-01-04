@@ -1504,7 +1504,8 @@ exports.AmebaGame = async (req, res) => {
                                     res.status(201).json({
                                         error_code: "OK",
                                         balance: balanceString,
-                                        time: time
+                                        time: time,
+                                        action: actionid
                                     });
                                 }
                             });
