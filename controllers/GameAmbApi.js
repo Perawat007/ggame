@@ -1484,7 +1484,7 @@ exports.AmebaGame = async (req, res) => {
                         if (results[0].roundId !== tx_id) {
                             const balanceNow = balanceNum - amount
                             const balanceString = balanceNow.toFixed(2);
-                            switch (results[0].roundId) {
+                            switch (results[0].actiongamenow) {
                                 case '1':
                                     actionid = "1.1";
                                     break;
